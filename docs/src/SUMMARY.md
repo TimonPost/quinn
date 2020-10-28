@@ -2,7 +2,7 @@
 
 - [QUINN Introduction](quinn.md)
 - [QUICK Introduction](quic.md)
-- [Protocols](./protocols/transport-guarantees.md)
-    - [Transport Guarantees](./protocols/transport-guarantees.md)
-    - [Transport Protocols](protocols/transport-protocols.md)
-    - [Problems of TCP](protocols/tcp-problems.md)
+- [Network Introduction](./network-introduction/introduction.md)
+    - [Transport Guarantees](./network-introduction/transport-guarantees.md)
+    - [Transport Protocols](network-introduction/transport-protocols.md)
+    - [Problems of TCP](network-introduction/tcp-problems.md)
