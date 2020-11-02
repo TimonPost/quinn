@@ -1,7 +1,7 @@
 # Transport Guarantees
 
-Before diving into any protocol specifics, lets define what we mean by terminology that is often used while talking about protocols.
-The protocols that we will be discussing share some combinations of guarantees noted on this page. 
+Before diving into any protocol specifics, lets define some terminology that is often used while talking about protocols.
+The protocols that we will be discussing share some combinations of 'transport guarantees'. 
 In your protocol selection you must clearly have in mind what it that you need.    
 
 ## Ordering VS Sequencing
@@ -33,13 +33,10 @@ There are 5 main different ways you can transfer data:
 |   **Reliable Sequenced**     |    Only old     |      No            |     Sequenced    |    Only newest
 
 UDP is unreliable, while TCP is reliable.
-Reliability gives great uncertainty but a lot of freedom, while reliability gives certainty with costs in speed and freedom.
-This is why protocols like QUIC build on UDP instead of TCP. 
-UDP has few limitations that give the end-user more control over his transport. 
-
-Many protocols play with the above-mentioned transport guarantees to support a certain use case. 
-You can take protocols like RUDP, SCTP, QUIC, netcode, laminar as an example.    
-It is therefore important to understand what you need for your use-case.
+Reliability gives great uncertainty with a lot of freedom, while reliability gives great certainty with costs in speed and freedom.
+That is why protocols such as QUIC, RUDP, SCTP, QUIC, netcode, laminar build on UDP instead of TCP. 
+UDP has far fewer limitations that give the end user more control over the transmission. 
+A big factor for you to consider are the required transport guarantees needed for your usecases. 
 
 [1]: https://en.wikipedia.org/wiki/Packet_loss
 [2]: https://observersupport.viavisolutions.com/html_doc/current/index.html#page/gigastor_hw/packet_deduplicating.html

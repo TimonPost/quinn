@@ -11,10 +11,11 @@ For this section we will be using the [Internet protocol suite][internet-protoco
 
 ![OSI model](../images/osi-model.png)
 
-Different layers serve different use-cases. 
-The application layer is not responsible for the data transmission while the transport layer is. 
-TCP and UDP are working at the transport layer while a protocol like QUIC works on the application layer.  
-QUIC is built on top of UDP which performs the transport on the transport layer.  
+Different layers serve different use cases. 
+For example, the application layer is not responsible for the data transfer while the transport layer is. 
+Both TCP and UDP work on the transport layer while a protocol like QUIC works on the application layer.  
+The advantage of this is that routers and firewalls see these protocols as a UDP or TCP instead of QUIC.
+Because no special hardware software is needed, it follows that development can be faster and that adobtion can occur in parallel.
 
 ## IP - Internet Layer
 
@@ -22,7 +23,7 @@ All communication over the internet is happening ontop of IP (Internet Protocol)
 The internet protocol works by splitting data into little chunks called datagrams or packets. 
 The chunks are then sent across the internet from one IP address to another.
 However, this protocol transfers packets across the network without any guarantee and it is by nature [unreliable][unreliable].
-For certain applications, we need certain specific guarantees. 
+Therefore we need certain specific guarantees. 
 This is exactly were transport protocols, like TCP, UPD, and application protocols, like QUIC, HTTP, come in. 
 
 ## TCP/IP and UDP Comparison - Transport layer
@@ -30,8 +31,8 @@ This is exactly were transport protocols, like TCP, UPD, and application protoco
 **TCP:** stands for 'transmission control protocol' and adds certain guarantees ontop of [IP](#ip). 
 It forms the backbone for almost everything you do online, from web browsing to IRC to email to file transfer.
 
-**UDP** stands for 'user datagram protocol' and it’s another protocol built on top of IP, but unlike TCP, 
-instead of adding lots of features and complexity, UDP is a very thin layer over IP and is [unreliable][unreliable] in nature.
+**UDP** stands for 'user datagram protocol'  and adds certain guarantees ontop of [IP](#ip), but unlike TCP, 
+instead of adding lots of features and complexity, UDP is a very thin layer over IP and is also [unreliable][unreliable] in nature.
 
 | Feature |  TCP  | UDP |
 | :-------------: | :-------------: | :-------------:    |
