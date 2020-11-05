@@ -36,7 +36,7 @@ UDP is unreliable, while TCP is reliable.
 Reliability gives great uncertainty with a lot of freedom, while reliability gives great certainty with costs in speed and freedom.
 That is why protocols such as QUIC, RUDP, SCTP, QUIC, netcode, laminar build on UDP instead of TCP. 
 UDP has far fewer limitations that give the end user more control over the transmission. 
-A big factor for you to consider are the required transport guarantees needed for your usecases. 
+A big factor for to consider are the required transport guarantees needed for your usecases. 
 
 [1]: https://en.wikipedia.org/wiki/Packet_loss
 [2]: https://observersupport.viavisolutions.com/html_doc/current/index.html#page/gigastor_hw/packet_deduplicating.html

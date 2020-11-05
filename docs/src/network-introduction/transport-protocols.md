@@ -2,11 +2,11 @@
 
 It is an excellent question to ask what protocol suits your project the most. 
 Different protocols serve different use cases and the wrong protocol can be catastrophic. 
-Before jumping directly into the meat of QUIC, it can be usefull to understand its underlying motivations. 
+Before jumping directly into the meat of QUIC, it can be useful to understand its underlying motivations. 
 For those motivations we have to inspect the flaws of TCP and nature of UDP, 
 because QUIC tries to improve the flaws of TCP ontop of UDP.
  
-If your already familiar with terminologies as IP/TCP/UDP and their guarantees and differences feel free to skipp to this section. 
+If your already familiar with terminologies as IP/TCP/UDP and their [transport guarantees][transport-guarantees] and differences feel free to skipp this section. 
 For this section we will be using the [Internet protocol suite][internet-protocol-suite] as a guidance. 
 
 ![OSI model](../images/osi-model.png)
@@ -15,7 +15,7 @@ Different layers serve different use cases.
 For example, the application layer is not responsible for the data transfer while the transport layer is. 
 Both TCP and UDP work on the transport layer while a protocol like QUIC works on the application layer.  
 The advantage of this is that routers and firewalls see these protocols as a UDP or TCP instead of QUIC.
-Because no special hardware software is needed, it follows that development can be faster and that adobtion can occur in parallel.
+Because no special hardware software is needed, it follows that development can be faster and that adoption can occur in parallel.
 
 ## IP - Internet Layer
 
@@ -37,12 +37,13 @@ instead of adding lots of features and complexity, UDP is a very thin layer over
 | Feature |  TCP  | UDP |
 | :-------------: | :-------------: | :-------------:    |
 |  [Connection-Oriented][connection-oriented]  |       Yes                              |      No                       |
-|  [Transport Guarantees][transport-gurantees] | [Reliable Ordered][reliable-ordered]   |      [Unreliable][unreliable] |
+|  [Transport Guarantees][transport-guarantees] | [Reliable Ordered][reliable-ordered]   |      [Unreliable][unreliable] |
 |  Packet Transfer                             | [Stream-based][stream-based]           |      Message based            |
 |  Automatic [fragmentation][ip-fragmentation] | Yes                                    |      Yes, but better is to stay below datagram size limit |
 |  Header Size                                 |  20 bytes                              |      8 bytes                  |
 |  [Control Flow, Congestion Avoidance/Control][congestion-control] | Yes               |      No                       |                                            
 
+[internet-protocol-suite]: https://en.wikipedia.org/wiki/Internet_protocol_suite
 [stream-based]: https://en.wikipedia.org/wiki/Stream_(computing)
 [congestion-control]: https://en.wikipedia.org/wiki/TCP_congestion_control
 [connection-oriented]: https://en.wikipedia.org/wiki/Connection-oriented_communication
@@ -50,4 +51,4 @@ instead of adding lots of features and complexity, UDP is a very thin layer over
 [unreliable]: ./transport-guarantees.md#unreliable
 [reliable-ordered]: ./transport-guarantees.md#reliable-ordered
 [reliable-sequenced]: ./transport-guarantees.md#reliable-sequenced
-[transport-gurantees]: ./transport-guarantees.md
+[transport-guarantees]: ./transport-guarantees.md
