@@ -55,6 +55,20 @@ You can see how expensive it is to create a TCP connection. In a scenario of TCP
 If the website is big in size, an additional load time can make the website load over a second into seconds. 
 Which is of course disturbing for our short attention spans. 
 
+## Requests in Segment
+
+TCP segment can only carry a single HTTP/1.1 Request/Response. 
+Consequently it is possible that a large number of small segments are sent within
+an HTTP/1.1 session. This can lead to a large overhead.
+
+## Client Connection Initiation
+
+HTTP/1.1 transfers are always initiated by the client. 
+This decreases the performance of HTTP/1.1 significantly when loading embedded files, because a server has to
+wait for a request from the client, even if the server knows
+that the client needs a specific resource.
+
+
 [order]: ./transport-guarantees.md#ordering-vs-sequencing
 [reliable-ordered]: ./transport-guarantees.md#reliable-ordered
 [internet-protocol-suite]: https://en.wikipedia.org/wiki/Internet_protocol_suite
