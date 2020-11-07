@@ -1,6 +1,7 @@
 # Summary
 
 - [QUINN Introduction](quinn.md)
+    - [Data Transfer](quin/data-transfer.md)
 - [QUICK Introduction](quic.md)
 - [Network Introduction](network-introduction.md)
     - [Transport Guarantees](./network-introduction/transport-guarantees.md)
