@@ -1,7 +1,11 @@
-Data can be either stream-based or message-based executed in Quinn.   
+# Data Transfer
+In het [vorige hoofdstuk](set-up-connection.md) hebben we gekenen hoe je een `Endpoint` kan opzetten 
+en vervolgens toegang kan krijgen tot een `NewConnectie` instantie.
+Nu gaan we kijken hoe je data over deze verbinding kan sturen. 
 
 ## Multiplexing
 
+Alhoewel QUIC op UDP is gebouwd onderstuend het streams.
 A QUIC stream is similar to a TCP stream, but you are not limited to a single stream.
 You can open multiple streams between two peers. 
 This is also called 'multiplexing'.
