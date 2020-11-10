@@ -47,7 +47,31 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="ca3fcb47-bbae-45d4-b725-f93b0b257dc7" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/docs/book/.gitignore" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/docs/book/book.toml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/docs/book/src/SUMMARY.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/docs/book/src/quic.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/docs/book/src/quinn.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/quinn-proto/src/connection/stats.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.github/workflows/book.yml" beforeDir="false" afterPath="$PROJECT_DIR$/.github/workflows/book.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.github/workflows/rust.yml" beforeDir="false" afterPath="$PROJECT_DIR$/.github/workflows/rust.yml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bench/src/bulk.rs" beforeDir="false" afterPath="$PROJECT_DIR$/bench/src/bulk.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/quinn-proto/src/cid_queue.rs" beforeDir="false" afterPath="$PROJECT_DIR$/quinn-proto/src/cid_queue.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/quinn-proto/src/config.rs" beforeDir="false" afterPath="$PROJECT_DIR$/quinn-proto/src/config.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/quinn-proto/src/connection/mod.rs" beforeDir="false" afterPath="$PROJECT_DIR$/quinn-proto/src/connection/mod.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/quinn-proto/src/connection/streams.rs" beforeDir="false" afterPath="$PROJECT_DIR$/quinn-proto/src/connection/streams.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/quinn-proto/src/endpoint.rs" beforeDir="false" afterPath="$PROJECT_DIR$/quinn-proto/src/endpoint.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/quinn-proto/src/shared.rs" beforeDir="false" afterPath="$PROJECT_DIR$/quinn-proto/src/shared.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/quinn-proto/src/tests/mod.rs" beforeDir="false" afterPath="$PROJECT_DIR$/quinn-proto/src/tests/mod.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/quinn-proto/src/transport_parameters.rs" beforeDir="false" afterPath="$PROJECT_DIR$/quinn-proto/src/transport_parameters.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/quinn/src/connection.rs" beforeDir="false" afterPath="$PROJECT_DIR$/quinn/src/connection.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/quinn/src/endpoint.rs" beforeDir="false" afterPath="$PROJECT_DIR$/quinn/src/endpoint.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/quinn/src/platform/fallback.rs" beforeDir="false" afterPath="$PROJECT_DIR$/quinn/src/platform/fallback.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/quinn/src/platform/mod.rs" beforeDir="false" afterPath="$PROJECT_DIR$/quinn/src/platform/mod.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/quinn/src/platform/unix.rs" beforeDir="false" afterPath="$PROJECT_DIR$/quinn/src/platform/unix.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/quinn/src/udp.rs" beforeDir="false" afterPath="$PROJECT_DIR$/quinn/src/udp.rs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
