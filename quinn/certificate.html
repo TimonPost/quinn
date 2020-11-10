@@ -95,7 +95,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded "><a href="../quinn.html"><strong aria-hidden="true">1.</strong> QUINN Introduction</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../quin/certificate.html" class="active"><strong aria-hidden="true">1.1.</strong> Cryptography Setup</a></li><li class="chapter-item expanded "><a href="../quin/set-up-connection.html"><strong aria-hidden="true">1.2.</strong> Connection Setup</a></li><li class="chapter-item expanded "><a href="../quin/data-transfer.html"><strong aria-hidden="true">1.3.</strong> Data Transfer</a></li></ol></li><li class="chapter-item expanded "><a href="../quic.html"><strong aria-hidden="true">2.</strong> QUICK Introduction</a></li><li class="chapter-item expanded "><a href="../network-introduction.html"><strong aria-hidden="true">3.</strong> Network Introduction</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../network-introductionransport-guarantees.html"><strong aria-hidden="true">3.1.</strong> Transport Guarantees</a></li><li class="chapter-item expanded "><a href="../network-introduction/transport-protocols.html"><strong aria-hidden="true">3.2.</strong> Transport Protocols</a></li><li class="chapter-item expanded "><a href="../network-introduction/tcp-problems.html"><strong aria-hidden="true">3.3.</strong> Problems of TCP</a></li></ol></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded "><a href="../quinn.html"><strong aria-hidden="true">1.</strong> QUINN Introduction</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../quinn/introduction.html"><strong aria-hidden="true">1.1.</strong> Overview</a></li><li class="chapter-item expanded "><a href="../quinn/certificate.html" class="active"><strong aria-hidden="true">1.2.</strong> Cryptography Setup</a></li><li class="chapter-item expanded "><a href="../quinn/set-up-connection.html"><strong aria-hidden="true">1.3.</strong> Connection Setup</a></li><li class="chapter-item expanded "><a href="../quinn/data-transfer.html"><strong aria-hidden="true">1.4.</strong> Data Transfer</a></li></ol></li><li class="chapter-item expanded "><a href="../quic.html"><strong aria-hidden="true">2.</strong> QUICK Introduction</a></li><li class="chapter-item expanded "><a href="../network-introduction.html"><strong aria-hidden="true">3.</strong> Network Introduction</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../network-introduction/transport-guarantees.html"><strong aria-hidden="true">3.1.</strong> Transport Guarantees</a></li><li class="chapter-item expanded "><a href="../network-introduction/transport-protocols.html"><strong aria-hidden="true">3.2.</strong> Transport Protocols</a></li><li class="chapter-item expanded "><a href="../network-introduction/tcp-problems.html"><strong aria-hidden="true">3.3.</strong> Problems of TCP</a></li></ol></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -164,25 +164,42 @@
                 <div id="content" class="content">
                     <main>
                         <h1><a class="header" href="#certificates" id="certificates">Certificates</a></h1>
-<p>A Certificate Authority (CA) is an entity that issues digital certificates. 
-These digital certificates certify the ownership of a public key associated with a host, server, client, document, and more. 
-Digital certificates help to ensure users can trust that your content is actually from a reliable, safe source.</p>
-<p>By default, Quinn clients validate the cryptographic identity of servers they
-connect to. This prevents an active, on-path attacker from intercepting
-messages, but requires trusting some certificate authority and thus some configuration up-front. 
-However, it is possible to use Quinn over an insecure connection or self-sign your certificates. </p>
+<p>In this chapter, we discuss the configuration of the certificates that are <strong>required</strong> for a working Quinn connection. </p>
+<p>A <a href="https://en.wikipedia.org/wiki/Certificate_authority">Certificate Authority (CA)</a> is an entity that issues digital <a href="https://en.wikipedia.org/wiki/Public_key_certificate">certificates</a>. 
+These digital certificates certify ownership of a public key associated with, for example, a host, server, client, or document.
+Digital certificates ensure that users can be confident that the content actually comes from a reliable, secure source.</p>
+<p>By default, Quinn clients validate the cryptographic identity of the servers they connect to. 
+This prevents an attacker from intercepting messages.
+While it is great that quinn offers security by default it requires additional configuration.
+This additional configuration will be the subject of this chapter. </p>
 <h2><a class="header" href="#insecure-connection" id="insecure-connection">Insecure Connection</a></h2>
-<p>For some cases, including peer-to-peer, trust-on-first-use, deliberately
-insecure applications, or any case where servers are not identified by domain
-name, a certificate isn't practical. Arbitrary certificate validation logic can be
-implemented by enabling the <code>dangerous_configuration</code> feature of <code>rustls</code>. 
-In addition you need to override the certificate verifier by hand in the <code>ClientConfig</code>.</p>
-<p>First, add a <code>rustls</code> dependency with the <code>dangerous_configuration</code> feature flag to your toml file.</p>
+<p>A certificate is not practical for cases such as: peer-to-peer, trust-on-first-use, deliberately insecure applications, or when the servers are not identified by the domain name. Custom certificate validation logic can be implemented when the <code>dangerous_configuration</code> function of <a href="https://github.com/ctz/rustls">rustls</a> is enabled. 
+Once done, the certificate verifier can manually override in the <code>quinn::ClientConfig</code>.</p>
+<p>Start with adding a <a href="https://github.com/ctz/rustls">rustls</a> dependency with the <code>dangerous_configuration</code> feature flag to your toml file.</p>
 <pre><code class="language-toml">quinn = &quot;*&quot;
 rustls = { version = &quot;*&quot;, features = [&quot;dangerous_configuration&quot;, &quot;quic&quot;] }
 </code></pre>
-<p>Then, you can skip the certificate check on the client by implementing <code>rustls::ServerCertVerifier</code> and let it always return 'correct'.
-After that, we should configure our client to use this certificate verifier. </p>
+<p>Then, you can skip the certificate validation on the client by implementing <code>rustls::ServerCertVerifier</code> and let it always return 'correct'.</p>
+<pre><pre class="playground"><code class="language-rust">
+<span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>// Implementation of `ServerCertVerifier` that verifies everything as trustworthy.
+struct SkipCertificationVerification;
+
+impl rustls::ServerCertVerifier for SkipCertificationVerification {
+    fn verify_server_cert(
+        &amp;self,
+        _roots: &amp;rustls::RootCertStore,
+        _presented_certs: &amp;[rustls::Certificate],
+        _dns_name: webpki::DNSNameRef,
+        _ocsp_response: &amp;[u8],
+    ) -&gt; Result&lt;rustls::ServerCertVerified, rustls::TLSError&gt; {
+        Ok(ServerCertVerified::assertion())
+    }
+}
+<span class="boring">}
+</span></code></pre></pre>
+<p>After that, we can configure our <code>ClientConfig</code> to use this new <code>CertificateVerifier</code>. </p>
 <pre><pre class="playground"><code class="language-rust">
 <span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
@@ -202,14 +219,11 @@ After that, we should configure our client to use this certificate verifier. </p
 }
 <span class="boring">}
 </span></code></pre></pre>
-<p>Now, if you throw this <code>ClientConfig</code> into the <code>Endpoint::default_client_config()</code> your endpoint should verify all connections as trustworthy.</p>
+<p>Finally, if you throw this <code>ClientConfig</code> into the <code>Endpoint::default_client_config()</code> your endpoint should verify all connections as trustworthy.</p>
 <h2><a class="header" href="#using-certificates" id="using-certificates">Using Certificates</a></h2>
-<p>In this section we look at how to create a certificate for Quinn. 
-First we deal with the self-signed certificate, and after that the real certificates.</p>
-<p>There are two common types of certificate formats. Those are <code>.pem</code> and <code>.der</code>.
-The <code>.der</code> certificates are byte encoded while <code>.pem</code> are text encoded.<br />
-You can convert on to the other by using tooling such as openssl or also withing code its self as demonstrated below. </p>
-<p>Let's define two useful function that can dissect byte certificates and return nice instances of structures. </p>
+<p>In this section we look at certifying an endpoint with a real certificate. 
+This can be done with a real certificate, but also with a self-identified certificate. </p>
+<p>Let's define two useful functions that can dissect byte certificates and return quinn types.</p>
 <pre><pre class="playground"><code class="language-rust">
 <span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
@@ -228,11 +242,16 @@ pub fn parse_pem(cert: Vec&lt;u8&gt;, private_key: Vec&lt;u8&gt;) -&gt; anyhow::
 }
 <span class="boring">}
 </span></code></pre></pre>
+<p>There are two common certificate formats namely: <code>.pem</code> and <code>.der</code>.
+The <code>.der</code> certificates are byte-coded, while <code>.pem</code> is text-coded.
+You can translate one to the other by using tooling such as openssl or even within code self. 
+The code translation is shown above. </p>
 <h3><a class="header" href="#self-signed" id="self-signed">Self Signed</a></h3>
-<p>Sometimes working with your own certificate authority makes no sense, then you can use self-signed certificates. 
-For this purpose [rcgen][rcgen] can be used.
-You need to write the certificate to permanent storage for later reuse.
-Notice that <code>generate_simple_self_signed</code> supports both <code>.der</code> and <code>.pem</code> formatting.</p>
+<p>A <a href="https://en.wikipedia.org/wiki/Self-signed_certificate#:%7E:text=In%20cryptography%20and%20computer%20security,a%20CA%20aim%20to%20provide.">self-signed</a> certificate is a security certificate that is unknown not by a CA but by yourself. 
+These certificates are easy to create and cost no money. 
+However, they do not offer all the security features that certificates from a CA do have. 
+You can create a self-signed certificate using <a href="https://github.com/est31/rcgen">rcgen</a> and write it to a permanent place. 
+Note that <code>generate_simple_self_signed</code> supports both <code>.der</code> and <code>.pem</code> formatting.</p>
 <p>Let's look at an example:</p>
 <pre><pre class="playground"><code class="language-rust">
 <span class="boring">#![allow(unused)]
@@ -252,18 +271,16 @@ Notice that <code>generate_simple_self_signed</code> supports both <code>.der</c
 <span class="boring">}
 </span></code></pre></pre>
 <h3><a class="header" href="#official-certificates" id="official-certificates">Official Certificates</a></h3>
-<p>Let’s Encrypt is a CA and gives out certificates for free. 
-Its a very well-known CA used for many applications around the world.
+<p><a href="https://letsencrypt.org/getting-started/">Let's Encrypt</a> is a CA and distributes certificates for free. 
+Its a very well-known CA used by many applications around the world.
 We can cover a full lets-encrypt tutorial here but instead I am going to keep it short. 
-There is plenty of documentation out there which keeps itself up-to-date. </p>
+There is plenty of good documentation out there that can help you further.</p>
 <p><strong>Generate Certificate</strong></p>
-<p>Official certificates can be requested from an organization such as <a href="https://letsencrypt.org/getting-started/">Let's Encrypt</a>.
-Let's Encrypt works together with <a href="https://certbot.eff.org/instructions">Certbot</a> who will generate the certificate for you.
-Because we generate a certificate for a protocol we assume that you are not using a web server.
+<p>Let's Encrypt works with <a href="https://certbot.eff.org/instructions">Certbot</a>, certbort generates the certificate for you.
+Often a certificate is generated to secure a web server. Because we generate a certificate for a protocol, the configuration process will be slightly different than normal. We assume that you do not have a web server. 
 Select on the certbot website that you do not have a web server and follow the given installation instructions.</p>
-<p>If certbot is installed, run <code>certbot certonly --standalone</code>, this option assumes that you do not have a web server installed and will therefore run a web server during the process.
-After entering your information and domain addresses two <code>.pem</code> files, namely: Con <code>cert.pem</code> and <code>privkey.pem</code> will be generated.
-As soon as they are generated, copy them to your project. </p>
+<p>If certbot is installed, execute <code>certbot certonly --standalone</code>, this command will run a web server in the background during the process.
+Cerbot asks for your data, after entering it two <code>.pem</code> files are generated, namely <code>cert.pem</code> and <code>privkey.pem</code>. Copy them to your project because we will reference them in code. </p>
 <pre><pre class="playground"><code class="language-rust">
 <span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
@@ -274,9 +291,9 @@ parse_pem(cert, key)
 <span class="boring">}
 </span></code></pre></pre>
 <h3><a class="header" href="#configuring-certificates" id="configuring-certificates">Configuring Certificates</a></h3>
-<p>When you generated the certificate it needs to be configured into the client and server. 
-<code>certificate</code> is of type <code>Certificate</code> and <code>key</code> of type <code>PrivateKey</code>.</p>
+<p>Now you generated, or maybe you already had, the certificate, they need to be configured into the client and server. </p>
 <p><strong>Configure Server</strong></p>
+<p><em><code>certificate</code> is of type <code>Certificate</code> and <code>key</code> of type <code>PrivateKey</code>.</em></p>
 <pre><pre class="playground"><code class="language-rust">
 <span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
@@ -284,7 +301,9 @@ parse_pem(cert, key)
 builder.certificate(CertificateChain::from_certs(vec![certificate]), key)?;
 <span class="boring">}
 </span></code></pre></pre>
+<p>This is the only thing you need to do for your sever to be secured. </p>
 <p><strong>Configure Client</strong></p>
+<p>*<code>certificate</code> is of type <code>Certificate</code></p>
 <pre><pre class="playground"><code class="language-rust">
 <span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
@@ -292,21 +311,21 @@ builder.certificate(CertificateChain::from_certs(vec![certificate]), key)?;
 builder.add_certificate_authority(certificate)?;    
 <span class="boring">}
 </span></code></pre></pre>
-<p>If done well, your endpoint should be encrypted.</p>
-<p><a href="set-up-connection.html">Nextup</a>, we will have a take on how to setup the connection.</p>
+<p>This is the only thing you need to do for your client to be secured.</p>
+<p><a href="set-up-connection.html">Nextup</a>, we will investigate how to use this setup an connection with this certificate. </p>
 
                     </main>
 
                     <nav class="nav-wrapper" aria-label="Page navigation">
                         <!-- Mobile navigation buttons -->
                         
-                            <a rel="prev" href="../quinn.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                            <a rel="prev" href="../quinn/introduction.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                                 <i class="fa fa-angle-left"></i>
                             </a>
                         
 
                         
-                            <a rel="next" href="../quin/set-up-connection.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                            <a rel="next" href="../quinn/set-up-connection.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                                 <i class="fa fa-angle-right"></i>
                             </a>
                         
@@ -318,13 +337,13 @@ builder.add_certificate_authority(certificate)?;
 
             <nav class="nav-wide-wrapper" aria-label="Page navigation">
                 
-                    <a rel="prev" href="../quinn.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                    <a rel="prev" href="../quinn/introduction.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                         <i class="fa fa-angle-left"></i>
                     </a>
                 
 
                 
-                    <a rel="next" href="../quin/set-up-connection.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                    <a rel="next" href="../quinn/set-up-connection.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                         <i class="fa fa-angle-right"></i>
                     </a>
                 

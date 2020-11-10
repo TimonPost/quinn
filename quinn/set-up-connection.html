@@ -3,7 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>Data Transfer - Quinn</title>
+        <title>Connection Setup - Quinn</title>
         
         
 
@@ -95,7 +95,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded "><a href="../quinn.html"><strong aria-hidden="true">1.</strong> QUINN Introduction</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../quin/certificate.html"><strong aria-hidden="true">1.1.</strong> Cryptography Setup</a></li><li class="chapter-item expanded "><a href="../quin/set-up-connection.html"><strong aria-hidden="true">1.2.</strong> Connection Setup</a></li><li class="chapter-item expanded "><a href="../quin/data-transfer.html" class="active"><strong aria-hidden="true">1.3.</strong> Data Transfer</a></li></ol></li><li class="chapter-item expanded "><a href="../quic.html"><strong aria-hidden="true">2.</strong> QUICK Introduction</a></li><li class="chapter-item expanded "><a href="../network-introduction.html"><strong aria-hidden="true">3.</strong> Network Introduction</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../network-introductionransport-guarantees.html"><strong aria-hidden="true">3.1.</strong> Transport Guarantees</a></li><li class="chapter-item expanded "><a href="../network-introduction/transport-protocols.html"><strong aria-hidden="true">3.2.</strong> Transport Protocols</a></li><li class="chapter-item expanded "><a href="../network-introduction/tcp-problems.html"><strong aria-hidden="true">3.3.</strong> Problems of TCP</a></li></ol></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded "><a href="../quinn.html"><strong aria-hidden="true">1.</strong> QUINN Introduction</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../quinn/introduction.html"><strong aria-hidden="true">1.1.</strong> Overview</a></li><li class="chapter-item expanded "><a href="../quinn/certificate.html"><strong aria-hidden="true">1.2.</strong> Cryptography Setup</a></li><li class="chapter-item expanded "><a href="../quinn/set-up-connection.html" class="active"><strong aria-hidden="true">1.3.</strong> Connection Setup</a></li><li class="chapter-item expanded "><a href="../quinn/data-transfer.html"><strong aria-hidden="true">1.4.</strong> Data Transfer</a></li></ol></li><li class="chapter-item expanded "><a href="../quic.html"><strong aria-hidden="true">2.</strong> QUICK Introduction</a></li><li class="chapter-item expanded "><a href="../network-introduction.html"><strong aria-hidden="true">3.</strong> Network Introduction</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../network-introduction/transport-guarantees.html"><strong aria-hidden="true">3.1.</strong> Transport Guarantees</a></li><li class="chapter-item expanded "><a href="../network-introduction/transport-protocols.html"><strong aria-hidden="true">3.2.</strong> Transport Protocols</a></li><li class="chapter-item expanded "><a href="../network-introduction/tcp-problems.html"><strong aria-hidden="true">3.3.</strong> Problems of TCP</a></li></ol></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -163,159 +163,75 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1><a class="header" href="#data-transfer" id="data-transfer">Data Transfer</a></h1>
-<p>In het <a href="set-up-connection.html">vorige hoofdstuk</a> hebben we gekenen hoe je een <code>Endpoint</code> kan opzetten 
-en vervolgens toegang kan krijgen tot een <code>NewConnectie</code> instantie.
-Nu gaan we kijken hoe je data over deze verbinding kan sturen. </p>
-<h2><a class="header" href="#multiplexing" id="multiplexing">Multiplexing</a></h2>
-<p>Alhoewel QUIC op UDP is gebouwd onderstuend het streams.
-A QUIC stream is similar to a TCP stream, but you are not limited to a single stream.
-You can open multiple streams between two peers. 
-This is also called 'multiplexing'.</p>
-<p>Stream multiplexing can have a significant positive effect on the performance of applications if the resources assigned to streams are properly prioritized.
-Multiplexing is also used in the HTTP/2 protocol, but in QUIC it is not handled automatically.
-It is entirely in the hands of the user to deal efficiently with multiplexing.</p>
-<h2><a class="header" href="#stream-types" id="stream-types">Stream Types</a></h2>
-<p>Quinn offers three ways to send your data. 
-Two stream-based and one message-based.</p>
-<table><thead><tr><th align="left">Type</th><th align="left">Description</th><th align="left">Reference</th></tr></thead><tbody>
-<tr><td align="left"><strong>Bidirectional Stream</strong></td><td align="left">two way communication.</td><td align="left">see <code>open_bi</code></td></tr>
-<tr><td align="left"><strong>Unidirectional Stream</strong></td><td align="left">one way communication.</td><td align="left">see <code>open_uni</code></td></tr>
-<tr><td align="left"><strong>Unreliable Messaging</strong></td><td align="left">message based unreliable communication.</td><td align="left">see <code>send_datagram</code></td></tr>
-</tbody></table>
-<p>Soon we will discuss this in more detail with a few more people.</p>
-<h2><a class="header" href="#how-to-use" id="how-to-use">How to Use</a></h2>
-<p>You can open a new stream or read from an existing stream.
-New streams can be created with the methods <code>open_bi</code>, <code>open_uni</code> in <code>NewConnection::connection</code>.
-Existing streams can be found in <code>NewConnection</code>. 
-Both the client and the server are able to open a stream and start sending and receing constrained by the stream type. </p>
-<p><em>Iterate over various opened streams</em></p>
+                        <h1><a class="header" href="#connection-setup" id="connection-setup">Connection Setup</a></h1>
+<p>In het <a href="certificate.html">vorige hoofdstuk</a> is gekeken hoe we een certificaat kunnen configureren, dit aspect wordt daarom hier achterwege gelaten. 
+In dit hoofstuk wordt toegelicht hoe een connectie opgezet wordt.</p>
+<p>Een Quinn connectie kan opgezet worden met de <code>Endpoint</code> struct, dit is tevens de entry van de library. </p>
+<h2><a class="header" href="#example" id="example">Example</a></h2>
+<p>Laten we beginnen met het defineren van wat constanten. </p>
 <pre><pre class="playground"><code class="language-rust">
 <span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
-</span>async fn iterate_streams(mut connection: NewConnection) -&gt; anyhow::Result&lt;()&gt; {
-    // Iterate unidirectional streams with only the receiving side.
-    while let Some(Ok(recv)) = connection.uni_streams.next().await { }
-    // Iterate bidirectional streams with both sent and receiving side.
-    while let Some(Ok((sent, recv))) = connection.bi_streams.next().await { }
-    // Iterate arrived datagrams.
-    while let Some(Ok(bytes)) = connection.datagrams.next().await { }
+</span>static SERVER_NAME: &amp;str = &quot;localhost&quot;;
 
-    Ok(())
+fn client_addr() -&gt; SocketAddr {
+    &quot;127.0.0.1:5000&quot;.parse::&lt;SocketAddr&gt;().unwrap()
+}
+
+fn server_addr() -&gt; SocketAddr {
+    &quot;127.0.0.1:5001&quot;.parse::&lt;SocketAddr&gt;().unwrap()
 }
 <span class="boring">}
 </span></code></pre></pre>
-<p><em>Open different type of streams</em></p>
+<p>Voor zowel een server als client maken we gebruik van de <code>EndpointBuilder</code>. 
+De <code>EndpointBuilder</code> heeft een methode <code>EndpointBuider::bind(address)</code> waarmee je een address koppelt aan de endpoint. 
+Deze methode initializeerd een UDP-socket die quinn gebruikt.
+Daarnaast is het ook mogelijk om vanaf een bestaande socket een quinn endpoint te initialiseren. 
+Dit kan met de <code>EndpointBuider::with_socket</code> methode.</p>
+<p><strong>Client</strong></p>
+<p>Net als een TCP-client dien je een verbinding met een destination te maken. 
+In quinn kan dit met de methode <code>connect()</code>. 
+De <code>connect</code> methode heeft een argument 'servernaam', dit is de naam die in het certificaat staat. </p>
 <pre><pre class="playground"><code class="language-rust">
 <span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
-</span>async fn open_streams(mut connection: Connection) -&gt; anyhow::Result&lt;()&gt; {
-    // Open unidirectional stream.
-    let mut send = connection.
-        open_uni()
+</span>async fn client() -&gt; anyhow::Result&lt;()&gt; {
+    let mut endpoint_builder = Endpoint::builder();
+
+    // Bind this endpoint to a UDP socket on the given client address.
+    let (endpoint, _) = endpoint_builder.bind(&amp;client_addr())?;
+
+    // Connect to the server passing in the server name which is supposed to be in the server certificate.
+    let connection: NewConnection = endpoint
+        .connect(&amp;server_addr(), SERVER_NAME)?
         .await?;
 
-    // Open bidirectional stream.
-    let (send, recv) = connection.
-        open_bi()
-        .await?;
+    // Start transferring, receiving data, see DataTransfer tutorial.
 
     Ok(())
 }
 <span class="boring">}
 </span></code></pre></pre>
-<h2><a class="header" href="#bidirectional-streams" id="bidirectional-streams">Bidirectional Streams</a></h2>
-<p>With bidirectional streams you can carry data in both directions, for example, client to server and server to client.</p>
-<p><em>open bidirectional stream</em></p>
+<p><strong>Server</strong></p>
+<p>Net als een TCP Listener dien je naar inkomende connecties te luisteren. 
+Voor dat je kan luisteren naar connecties moet je met de <code>EndpointBuilder</code> de <code>Endpoint</code> als server configureren.<br />
+Let er op dat de configuratie zelf geen luister logica uitvoert, dit kan pas als je <code>bind()</code> hebt uitgevoert.</p>
 <pre><pre class="playground"><code class="language-rust">
 <span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
-</span>async fn open_bidirectional_stream(connection: Connection) -&gt; anyhow::Result&lt;()&gt; {
-    let (mut send, recv) = connection.
-        open_bi()
-        .await?;
+</span>async fn server() -&gt; anyhow::Result&lt;()&gt; {
+    let mut endpoint_builder = Endpoint::builder();
+    // Configure this endpoint as a server by passing in `ServerConfig`.
+    endpoint_builder.listen(ServerConfig::default());
 
-    send.write_all(b&quot;test&quot;).await?;
-    send.finish().await?;
-    
-    let received = recv.read_to_end(10).await?;
+    // Bind this endpoint to a UDP socket on the given server address. 
+    let (endpoint, mut incoming) = endpoint_builder.bind(&amp;server_addr())?;
 
-    Ok(())
-}
-<span class="boring">}
-</span></code></pre></pre>
-<p><em>iterate bidirectional stream(s)</em></p>
-<pre><pre class="playground"><code class="language-rust">
-<span class="boring">#![allow(unused)]
-</span><span class="boring">fn main() {
-</span>async fn receive_bidirectional_stream(mut connection: NewConnection) -&gt; anyhow::Result&lt;()&gt; {
-    while let Some(Ok((sent, recv))) = connection.bi_streams.next().await {
-        // Because it is a bidirectional stream, we can both sent and recieve.
-        println!(&quot;request: {:?}&quot;, recv.read_to_end(50).await?);
+    // Start iterating over incoming connections.
+    while let Some(conn) = incoming.next().await {
+        let mut connection: NewConnection = conn.await?;
 
-        send.write_all(b&quot;response&quot;).await?;
-        send.finish().await?;
-    }
-
-    Ok(())
-}
-<span class="boring">}
-</span></code></pre></pre>
-<h2><a class="header" href="#unidirectional-streams" id="unidirectional-streams">Unidirectional Streams</a></h2>
-<p>With unidirectional streams, you can carry data only in one direction, for example, from the initiator of the stream to its peer.</p>
-<p><em>open unidirectional stream</em></p>
-<pre><pre class="playground"><code class="language-rust">
-<span class="boring">#![allow(unused)]
-</span><span class="boring">fn main() {
-</span>async fn open_unidirectional_stream(connection: Connection)-&gt; anyhow::Result&lt;()&gt; {
-    let mut send = connection.
-        open_uni()
-        .await?;
-
-    send.write_all(b&quot;test&quot;).await.unwrap();
-    send.finish().await?;
-
-    Ok(())
-}
-<span class="boring">}
-</span></code></pre></pre>
-<p><em>iterating unidirectional stream(s)</em></p>
-<pre><pre class="playground"><code class="language-rust">
-<span class="boring">#![allow(unused)]
-</span><span class="boring">fn main() {
-</span>async fn receive_unidirectional_stream(mut connection: NewConnection) -&gt; anyhow::Result&lt;()&gt; {
-    while let Some(Ok(recv)) = connection.uni_streams.next().await {
-        // Because it is a unidirectional stream, we can only receive not sent back.
-        println!(&quot;{:?}&quot;, recv.read_to_end(50).await?);
-    }
-
-    Ok(())
-}
-<span class="boring">}
-</span></code></pre></pre>
-<h2><a class="header" href="#unreliable-messaging" id="unreliable-messaging">Unreliable Messaging</a></h2>
-<p>With unreliable messaging you can transfer data <a href="../network-introduction/transport-guarantees.html#unreliable">unreliable</a> over bare UDP.</p>
-<p><em>send datagram</em></p>
-<pre><pre class="playground"><code class="language-rust">
-<span class="boring">#![allow(unused)]
-</span><span class="boring">fn main() {
-</span>async fn sent_unreliable(connection: Connection)-&gt; anyhow::Result&lt;()&gt; {
-    connection.
-        send_datagram(b&quot;test&quot;.into())
-        .await?;
-
-    Ok(())
-}
-<span class="boring">}
-</span></code></pre></pre>
-<p><em>iterating datagram stream(s)</em></p>
-<pre><pre class="playground"><code class="language-rust">
-<span class="boring">#![allow(unused)]
-</span><span class="boring">fn main() {
-</span>async fn receive_datagram(mut connection: NewConnection) -&gt; anyhow::Result&lt;()&gt; {
-    while let Some(Ok(receivedBytes)) = connection.datagrams.next().await {
-        // Because it is a unidirectional stream, we can only receive not sent back.
-        println!(&quot;request: {:?}&quot;, received);
+        // Save connection somewhere, start transferring, receiving data, see DataTransfer tutorial.
     }
 
     Ok(())
@@ -328,13 +244,13 @@ Both the client and the server are able to open a stream and start sending and r
                     <nav class="nav-wrapper" aria-label="Page navigation">
                         <!-- Mobile navigation buttons -->
                         
-                            <a rel="prev" href="../quin/set-up-connection.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                            <a rel="prev" href="../quinn/certificate.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                                 <i class="fa fa-angle-left"></i>
                             </a>
                         
 
                         
-                            <a rel="next" href="../quic.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                            <a rel="next" href="../quinn/data-transfer.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                                 <i class="fa fa-angle-right"></i>
                             </a>
                         
@@ -346,13 +262,13 @@ Both the client and the server are able to open a stream and start sending and r
 
             <nav class="nav-wide-wrapper" aria-label="Page navigation">
                 
-                    <a rel="prev" href="../quin/set-up-connection.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                    <a rel="prev" href="../quinn/certificate.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                         <i class="fa fa-angle-left"></i>
                     </a>
                 
 
                 
-                    <a rel="next" href="../quic.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                    <a rel="next" href="../quinn/data-transfer.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                         <i class="fa fa-angle-right"></i>
                     </a>
                 
