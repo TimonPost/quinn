@@ -1,6 +1,6 @@
 # Problems of TCP 
 
-In [the previous section](./transport-protocols.md) we compared TCP with UDP, now the golden question: Why should we prefer one over the other? 
+In [the previous section](transport-protocols.md) we compared TCP with UDP, now the golden question: Why should we prefer one over the other? 
 One might ask: "Why choose so much uncertainty with UDP when TCP is so reliable and safe?". 
 That's a good question to ask yourself. 
 To answer that question we will have to delve a little deeper into how TCP works. 
@@ -69,8 +69,8 @@ wait for a request from the client, even if the server knows
 that the client needs a specific resource.
 
 
-[order]: ./transport-guarantees.md#ordering-vs-sequencing
-[reliable-ordered]: ./transport-guarantees.md#reliable-ordered
+[order]: transport-guarantees.md#ordering-vs-sequencing
+[reliable-ordered]: transport-guarantees.md#reliable-ordered
 [internet-protocol-suite]: https://en.wikipedia.org/wiki/Internet_protocol_suite
 [animation]: ../images/hol.gif
 [website-trend]: ../images/website-size-trend.png

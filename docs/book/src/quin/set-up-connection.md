@@ -8,7 +8,7 @@ Configuraties zoals cryptografie en transport instellingen.
 Echter valt dit buiten de scope van dit hoofstuk en wordt daarom hier niet besproken. 
 Hoe je een `Endpoint` configureerd kan je in [dit][LINK] hoofstuk vinden.
 Omdat we geen configuratie gebruiken zullen de komende voorbeelden dus niet out-of-the box werken.
-Als je een `Endpoint` heb opgezet kan je beginnen met het versturen en ontvangen van data, ziet [het volgende hoofdstuk](./data-transfer.md) voor meer informatie.
+Als je een `Endpoint` heb opgezet kan je beginnen met het versturen en ontvangen van data, ziet [het volgende hoofdstuk](data-transfer.md) voor meer informatie.
 
 ## Example
 

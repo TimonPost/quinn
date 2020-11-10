@@ -142,7 +142,7 @@ builder.add_certificate_authority(certificate)?;
 
 If done well, your endpoint should be encrypted.
 
-[Nextup](./set-up-connection.md), we will have a take on how to setup the connection.
+[Nextup](set-up-connection.md), we will have a take on how to setup the connection.
 
 [certbot]: https://certbot.eff.org/instructions
 [lets-encrypt]: https://letsencrypt.org/getting-started/

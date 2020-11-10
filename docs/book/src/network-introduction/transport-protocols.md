@@ -48,7 +48,7 @@ instead of adding lots of features and complexity, UDP is a very thin layer over
 [congestion-control]: https://en.wikipedia.org/wiki/TCP_congestion_control
 [connection-oriented]: https://en.wikipedia.org/wiki/Connection-oriented_communication
 [ip-fragmentation]: https://en.wikipedia.org/wiki/IP_fragmentation
-[unreliable]: ./transport-guarantees.md#unreliable
-[reliable-ordered]: ./transport-guarantees.md#reliable-ordered
-[reliable-sequenced]: ./transport-guarantees.md#reliable-sequenced
-[transport-guarantees]: ./transport-guarantees.md
+[unreliable]: transport-guarantees.md#unreliable
+[reliable-ordered]: transport-guarantees.md#reliable-ordered
+[reliable-sequenced]: transport-guarantees.md#reliable-sequenced
+[transport-guarantees]: transport-guarantees.md
