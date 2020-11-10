@@ -47,31 +47,12 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="ca3fcb47-bbae-45d4-b725-f93b0b257dc7" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/docs/book/.gitignore" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/docs/book/book.toml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/docs/book/src/SUMMARY.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/docs/book/src/quic.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/docs/book/src/quinn.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/quinn-proto/src/connection/stats.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.github/workflows/book.yml" beforeDir="false" afterPath="$PROJECT_DIR$/.github/workflows/book.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.github/workflows/rust.yml" beforeDir="false" afterPath="$PROJECT_DIR$/.github/workflows/rust.yml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/docs/book/src/quinn/introduction.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bench/src/bulk.rs" beforeDir="false" afterPath="$PROJECT_DIR$/bench/src/bulk.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/quinn-proto/src/cid_queue.rs" beforeDir="false" afterPath="$PROJECT_DIR$/quinn-proto/src/cid_queue.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/quinn-proto/src/config.rs" beforeDir="false" afterPath="$PROJECT_DIR$/quinn-proto/src/config.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/quinn-proto/src/connection/mod.rs" beforeDir="false" afterPath="$PROJECT_DIR$/quinn-proto/src/connection/mod.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/quinn-proto/src/connection/streams.rs" beforeDir="false" afterPath="$PROJECT_DIR$/quinn-proto/src/connection/streams.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/quinn-proto/src/endpoint.rs" beforeDir="false" afterPath="$PROJECT_DIR$/quinn-proto/src/endpoint.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/quinn-proto/src/shared.rs" beforeDir="false" afterPath="$PROJECT_DIR$/quinn-proto/src/shared.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/quinn-proto/src/tests/mod.rs" beforeDir="false" afterPath="$PROJECT_DIR$/quinn-proto/src/tests/mod.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/quinn-proto/src/transport_parameters.rs" beforeDir="false" afterPath="$PROJECT_DIR$/quinn-proto/src/transport_parameters.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/quinn/src/connection.rs" beforeDir="false" afterPath="$PROJECT_DIR$/quinn/src/connection.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/quinn/src/endpoint.rs" beforeDir="false" afterPath="$PROJECT_DIR$/quinn/src/endpoint.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/quinn/src/platform/fallback.rs" beforeDir="false" afterPath="$PROJECT_DIR$/quinn/src/platform/fallback.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/quinn/src/platform/mod.rs" beforeDir="false" afterPath="$PROJECT_DIR$/quinn/src/platform/mod.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/quinn/src/platform/unix.rs" beforeDir="false" afterPath="$PROJECT_DIR$/quinn/src/platform/unix.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/quinn/src/udp.rs" beforeDir="false" afterPath="$PROJECT_DIR$/quinn/src/udp.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/book/src/SUMMARY.md" beforeDir="false" afterPath="$PROJECT_DIR$/docs/book/src/SUMMARY.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/book/src/quin/certificate.md" beforeDir="false" afterPath="$PROJECT_DIR$/docs/book/src/quinn/certificate.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/book/src/quin/data-transfer.md" beforeDir="false" afterPath="$PROJECT_DIR$/docs/book/src/quinn/data-transfer.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/book/src/quin/set-up-connection.md" beforeDir="false" afterPath="$PROJECT_DIR$/docs/book/src/quinn/set-up-connection.md" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -106,6 +87,18 @@
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="nodejs_package_manager_path" value="npm" />
     <property name="org.rust.cargo.project.model.PROJECT_DISCOVERY" value="true" />
+  </component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="E:\unreal\programming\git\quinn\docs\book\src" />
+    </key>
+  </component>
+  <component name="RunManager">
+    <configuration default="true" type="GradleAppRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" PASS_PARENT_ENVS_2="true">
+      <method v="2">
+        <option name="com.jetbrains.cidr.cpp.gradle.execution.GradleNativeBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
   </component>
   <component name="RustProjectSettings">
     <option name="toolchainHomeDirectory" value="$USER_HOME$/.cargo/bin" />
@@ -147,5 +140,13 @@
       <screen x="0" y="0" width="2560" height="1050" />
     </state>
     <state x="1015" y="326" key="#com.intellij.fileTypes.FileTypeChooser/-2560.0.2560.1050/0.0.2560.1050@0.0.2560.1050" timestamp="1604761771774" />
+    <state x="1010" y="271" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog" timestamp="1605011751474">
+      <screen x="0" y="0" width="2560" height="1050" />
+    </state>
+    <state x="1010" y="271" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog/-2560.0.2560.1050/0.0.2560.1050@0.0.2560.1050" timestamp="1605011751474" />
+    <state x="884" y="135" key="com.intellij.openapi.editor.actions.MultiplePasteAction$ClipboardContentChooser" timestamp="1605025295080">
+      <screen x="0" y="0" width="2560" height="1050" />
+    </state>
+    <state x="884" y="135" key="com.intellij.openapi.editor.actions.MultiplePasteAction$ClipboardContentChooser/-2560.0.2560.1050/0.0.2560.1050@0.0.2560.1050" timestamp="1605025295080" />
   </component>
 </project>
