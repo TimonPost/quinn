@@ -97,7 +97,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded "><a href="quinn.html"><strong aria-hidden="true">1.</strong> Quinn introduction</a></li><li class="chapter-item expanded "><a href="quic.html"><strong aria-hidden="true">2.</strong> The QUIC protocol</a></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded "><a href="quinn.html"><strong aria-hidden="true">1.</strong> QUINN Introduction</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="quin/certificate.html"><strong aria-hidden="true">1.1.</strong> Cryptography Setup</a></li><li class="chapter-item expanded "><a href="quin/set-up-connection.html"><strong aria-hidden="true">1.2.</strong> Connection Setup</a></li><li class="chapter-item expanded "><a href="quin/data-transfer.html"><strong aria-hidden="true">1.3.</strong> Data Transfer</a></li></ol></li><li class="chapter-item expanded "><a href="quic.html"><strong aria-hidden="true">2.</strong> QUICK Introduction</a></li><li class="chapter-item expanded "><a href="network-introduction.html"><strong aria-hidden="true">3.</strong> Network Introduction</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="network-introductionransport-guarantees.html"><strong aria-hidden="true">3.1.</strong> Transport Guarantees</a></li><li class="chapter-item expanded "><a href="network-introduction/transport-protocols.html"><strong aria-hidden="true">3.2.</strong> Transport Protocols</a></li><li class="chapter-item expanded "><a href="network-introduction/tcp-problems.html"><strong aria-hidden="true">3.3.</strong> Problems of TCP</a></li></ol></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -166,26 +166,478 @@
                 <div id="content" class="content">
                     <main>
                         <p>{{#include ../../README.md}}</p>
-<h1><a class="header" href="#the-quic-protocol" id="the-quic-protocol">The QUIC protocol</a></h1>
-<p><a href="https://en.wikipedia.org/wiki/QUIC">QUIC</a> is a general-purpose network protocol built on top of UDP.
-The protocol is still under development and standardized by the <a href="https://www.ietf.org/">IETF</a>. 
-Quinn strives to implement the latest <a href="https://datatracker.ietf.org/doc/draft-ietf-quic-transport/">draft</a> but may lag a bit behind. Although QUIC is still in a draft phase, 
-the protocol is used for all connections from Chrome web browsers to the Google servers. </p>
-<p>QUIC solves a number of transport-layer and application-layer problems experienced by modern web applications. 
-It is very similar to TCP+TLS+HTTP2, but implemented on top of UDP. 
-Having QUIC as a self-contained protocol allows innovations which aren’t 
-possible with existing protocols as they are hampered by legacy clients and middleboxes.</p>
-<p>Key advantages of QUIC over TCP+TLS+HTTP2 include:</p>
-<ul>
-<li>Improved connection establishment speed (0-rtt).</li>
-<li>Improved congestion control by moving congestion control algorithms into the user space at both endpoints.</li>
-<li>Improved bandwidth estimation in each direction to avoid congestion. </li>
-<li>Improved multiplexing without head-of-line blocking.</li>
-<li>Contains forward error correction (FEC). </li>
-</ul>
-<p>While QUIC's intentions are originally web-oriented, it offers interesting opportunities in other areas like game networking.
-One thing is for sure, QUIC has many great potentials and will serve us in the future with HTTP/3. </p>
-<p>In the upcoming chapter we will be discussing various aspects of QUIC also in relation to Quinn. </p>
+<h1><a class="header" href="#certificates" id="certificates">Certificates</a></h1>
+<p>A Certificate Authority (CA) is an entity that issues digital certificates. 
+These digital certificates certify the ownership of a public key associated with a host, server, client, document, and more. 
+Digital certificates help to ensure users can trust that your content is actually from a reliable, safe source.</p>
+<p>By default, Quinn clients validate the cryptographic identity of servers they
+connect to. This prevents an active, on-path attacker from intercepting
+messages, but requires trusting some certificate authority and thus some configuration up-front. 
+However, it is possible to use Quinn over an insecure connection or self-sign your certificates. </p>
+<h2><a class="header" href="#insecure-connection" id="insecure-connection">Insecure Connection</a></h2>
+<p>For some cases, including peer-to-peer, trust-on-first-use, deliberately
+insecure applications, or any case where servers are not identified by domain
+name, a certificate isn't practical. Arbitrary certificate validation logic can be
+implemented by enabling the <code>dangerous_configuration</code> feature of <code>rustls</code>. 
+In addition you need to override the certificate verifier by hand in the <code>ClientConfig</code>.</p>
+<p>First, add a <code>rustls</code> dependency with the <code>dangerous_configuration</code> feature flag to your toml file.</p>
+<pre><code class="language-toml">quinn = &quot;*&quot;
+rustls = { version = &quot;*&quot;, features = [&quot;dangerous_configuration&quot;, &quot;quic&quot;] }
+</code></pre>
+<p>Then, you can skip the certificate check on the client by implementing <code>rustls::ServerCertVerifier</code> and let it always return 'correct'.
+After that, we should configure our client to use this certificate verifier. </p>
+<pre><pre class="playground"><code class="language-rust">
+<span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>pub fn insecure() -&gt; ClientConfig {
+    let mut cfg = quinn::ClientConfigBuilder::default().build();
+
+    // Get a mutable reference to the 'crypto' config in the 'client config'..
+    let tls_cfg: &amp;mut rustls::ClientConfig =
+        std::sync::Arc::get_mut(&amp;mut cfg.crypto).unwrap();
+
+    // Change the certification verifier.
+    // This is only available when compiled with 'dangerous_configuration' feature.
+    tls_cfg
+        .dangerous()
+        .set_certificate_verifier(Arc::new(SkipCertificationVerification));
+    cfg
+}
+<span class="boring">}
+</span></code></pre></pre>
+<p>Now, if you throw this <code>ClientConfig</code> into the <code>Endpoint::default_client_config()</code> your endpoint should verify all connections as trustworthy.</p>
+<h2><a class="header" href="#using-certificates" id="using-certificates">Using Certificates</a></h2>
+<p>In this section we look at how to create a certificate for Quinn. 
+First we deal with the self-signed certificate, and after that the real certificates.</p>
+<p>There are two common types of certificate formats. Those are <code>.pem</code> and <code>.der</code>.
+The <code>.der</code> certificates are byte encoded while <code>.pem</code> are text encoded.<br />
+You can convert on to the other by using tooling such as openssl or also withing code its self as demonstrated below. </p>
+<p>Let's define two useful function that can dissect byte certificates and return nice instances of structures. </p>
+<pre><pre class="playground"><code class="language-rust">
+<span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>pub fn parse_der(cert: Vec&lt;u8&gt;, private_key: Vec&lt;u8&gt;) -&gt; anyhow::Result&lt;(quinn::Certificate, quinn::PrivateKey)&gt; {
+    let cert = quinn::Certificate::from_der(&amp;cert)?;
+    let key = quinn::PrivateKey::from_der(&amp;private_key)?;
+    Ok((cert, key))
+}
+
+pub fn parse_pem(cert: Vec&lt;u8&gt;, private_key: Vec&lt;u8&gt;) -&gt; anyhow::Result&lt;(quinn::Certificate, quinn::PrivateKey)&gt; {
+    // Parse to certificate chain whereafter taking the first certificate in this chain.
+    let cert = quinn::CertificateChain::from_pem(&amp;cert)?.iter().next().unwrap().clone();
+    let key = quinn::PrivateKey::from_pem(&amp;private_key)?;
+
+    Ok((quinn::Certificate::from(cert), key))
+}
+<span class="boring">}
+</span></code></pre></pre>
+<h3><a class="header" href="#self-signed" id="self-signed">Self Signed</a></h3>
+<p>Sometimes working with your own certificate authority makes no sense, then you can use self-signed certificates. 
+For this purpose [rcgen][rcgen] can be used.
+You need to write the certificate to permanent storage for later reuse.
+Notice that <code>generate_simple_self_signed</code> supports both <code>.der</code> and <code>.pem</code> formatting.</p>
+<p>Let's look at an example:</p>
+<pre><pre class="playground"><code class="language-rust">
+<span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>pub fn generate_self_signed_cert(cert_path: &amp;str, key_path: &amp;str) -&gt; anyhow::Result&lt;(quinn::Certificate, quinn::PrivateKey)&gt; {
+    // Generate dummy certificate.
+    let certificate = rcgen::generate_simple_self_signed(vec![&quot;localhost&quot;.into()]).unwrap();
+    let serialized_key = certificate.serialize_private_key_der();
+    let serialized_certificate = certificate.serialize_der().unwrap();
+
+    // Write to files.
+    fs::write(&amp;cert_path, &amp;serialized_certificate).context(&quot;failed to write certificate&quot;)?;
+    fs::write(&amp;key_path, &amp;serialized_key).context(&quot;failed to write private key&quot;)?;
+
+    parse_der(serialized_certificate, serialized_key)
+}
+<span class="boring">}
+</span></code></pre></pre>
+<h3><a class="header" href="#official-certificates" id="official-certificates">Official Certificates</a></h3>
+<p>Let’s Encrypt is a CA and gives out certificates for free. 
+Its a very well-known CA used for many applications around the world.
+We can cover a full lets-encrypt tutorial here but instead I am going to keep it short. 
+There is plenty of documentation out there which keeps itself up-to-date. </p>
+<p><strong>Generate Certificate</strong></p>
+<p>Official certificates can be requested from an organization such as <a href="https://letsencrypt.org/getting-started/">Let's Encrypt</a>.
+Let's Encrypt works together with <a href="https://certbot.eff.org/instructions">Certbot</a> who will generate the certificate for you.
+Because we generate a certificate for a protocol we assume that you are not using a web server.
+Select on the certbot website that you do not have a web server and follow the given installation instructions.</p>
+<p>If certbot is installed, run <code>certbot certonly --standalone</code>, this option assumes that you do not have a web server installed and will therefore run a web server during the process.
+After entering your information and domain addresses two <code>.pem</code> files, namely: Con <code>cert.pem</code> and <code>privkey.pem</code> will be generated.
+As soon as they are generated, copy them to your project. </p>
+<pre><pre class="playground"><code class="language-rust">
+<span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>// Read from certificate and key from directory. 
+let (cert, key) = fs::read(&amp;&quot;./cert.pem&quot;).and_then(|x| Ok((x, fs::read(&amp;&quot;./privkey.pem&quot;)?)))?;
+// Parse bytes to type.
+parse_pem(cert, key)
+<span class="boring">}
+</span></code></pre></pre>
+<h3><a class="header" href="#configuring-certificates" id="configuring-certificates">Configuring Certificates</a></h3>
+<p>When you generated the certificate it needs to be configured into the client and server. 
+<code>certificate</code> is of type <code>Certificate</code> and <code>key</code> of type <code>PrivateKey</code>.</p>
+<p><strong>Configure Server</strong></p>
+<pre><pre class="playground"><code class="language-rust">
+<span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>let mut builder = ServerConfigBuilder::default();
+builder.certificate(CertificateChain::from_certs(vec![certificate]), key)?;
+<span class="boring">}
+</span></code></pre></pre>
+<p><strong>Configure Client</strong></p>
+<pre><pre class="playground"><code class="language-rust">
+<span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>let mut builder = ClientConfigBuilder::default();
+builder.add_certificate_authority(certificate)?;    
+<span class="boring">}
+</span></code></pre></pre>
+<p>If done well, your endpoint should be encrypted.</p>
+<p><a href="quin/set-up-connection.html">Nextup</a>, we will have a take on how to setup the connection.</p>
+<h1><a class="header" href="#connection-setup" id="connection-setup">Connection Setup</a></h1>
+<p>Het opzetten van een quin connectie is het begin van een grote stap naar een betere wereld, echter moet je hier wel wat voor doen.
+Het begint bij de <code>Endpoint</code> struct, dit is tevens de entry van de library.<br />
+Vanaf uit hier kan je verbindingen opzetten naar andere peers. 
+Om een verbinding op te kunnen zetten moet je een aantal configuraties door voeren. 
+Configuraties zoals cryptografie en transport instellingen. 
+Echter valt dit buiten de scope van dit hoofstuk en wordt daarom hier niet besproken. 
+Hoe je een <code>Endpoint</code> configureerd kan je in [dit][LINK] hoofstuk vinden.
+Omdat we geen configuratie gebruiken zullen de komende voorbeelden dus niet out-of-the box werken.
+Als je een <code>Endpoint</code> heb opgezet kan je beginnen met het versturen en ontvangen van data, ziet <a href="quin/data-transfer.html">het volgende hoofdstuk</a> voor meer informatie.</p>
+<h2><a class="header" href="#example" id="example">Example</a></h2>
+<p>Laten we beginnen met het defineren van wat constanten. </p>
+<pre><pre class="playground"><code class="language-rust">
+<span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>static SERVER_NAME: &amp;str = &quot;localhost&quot;;
+
+fn client_addr() -&gt; SocketAddr {
+    &quot;127.0.0.1:5000&quot;.parse::&lt;SocketAddr&gt;().unwrap()
+}
+
+fn server_addr() -&gt; SocketAddr {
+    &quot;127.0.0.1:5001&quot;.parse::&lt;SocketAddr&gt;().unwrap()
+}
+<span class="boring">}
+</span></code></pre></pre>
+<p>Voor zowel een server als client kunnen we gebruik maken van de <code>EndpointBuilder</code>. 
+Hiermee kunnen we onze endpoint configuren als een server of client. 
+Het is van belang om je endpoint aan een address te koppelen.
+Dit doe je doormiddel van <code>EndpointBuider::bind(address)</code>. 
+Deze functie initializeerd een UDP-socket die door QUIC gebruikt wordt. 
+Het is ook mogelijk om vanaf een bestaande socket QUIC te initialiseren. 
+Gebruik hier voor <code>EndpointBuider::with_socket</code>.</p>
+<p><strong>Client</strong></p>
+<p>In het geval van een client endpoint dien je <code>connect()</code> op de endpoint aan te roepen. 
+De servernaam staat als het goed is in je certificaat. </p>
+<pre><pre class="playground"><code class="language-rust">
+<span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>async fn client() -&gt; anyhow::Result&lt;()&gt; {
+    let mut endpoint_builder = Endpoint::builder();
+
+    // Bind this endpoint to a UDP socket on the given client address.
+    let (endpoint, _) = endpoint_builder.bind(&amp;client_addr())?;
+
+    // Connect to the server passing in the server name which is supposed to be in the server certificate.
+    let connection: NewConnection = endpoint
+        .connect(&amp;server_addr(), SERVER_NAME)?
+        .await?;
+
+    // Start transferring, receiving data, see DataTransfer tutorial.
+
+    Ok(())
+}
+<span class="boring">}
+</span></code></pre></pre>
+<p><strong>Server</strong></p>
+<p>In het geval van een server dien je <code>EndpointBuilder::listen()</code> aan te roepen met de <code>ServerConfiguration</code>. 
+Let er op dat dit niets anders is dan het instellen van configuratie en dus geen lusiter logica uitvoert. </p>
+<p>De twee</p>
+<pre><pre class="playground"><code class="language-rust">
+<span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>async fn server() -&gt; anyhow::Result&lt;()&gt; {
+    let mut endpoint_builder = Endpoint::builder();
+    // Configure this endpoint as a server by passing in `ServerConfig`.
+    endpoint_builder.listen(ServerConfig::default());
+
+    // Bind this endpoint to a UDP socket on the given server address. 
+    let (endpoint, mut incoming) = endpoint_builder.bind(&amp;server_addr())?;
+
+    // Start iterating over incoming connections.
+    while let Some(conn) = incoming.next().await {
+        let mut connection: NewConnection = conn.await?;
+
+        // Save connection somewhere, start transferring, receiving data, see DataTransfer tutorial.
+    }
+
+    Ok(())
+}
+<span class="boring">}
+</span></code></pre></pre>
+<h1><a class="header" href="#data-transfer" id="data-transfer">Data Transfer</a></h1>
+<p>In het <a href="quin/set-up-connection.html">vorige hoofdstuk</a> hebben we gekenen hoe je een <code>Endpoint</code> kan opzetten 
+en vervolgens toegang kan krijgen tot een <code>NewConnectie</code> instantie.
+Nu gaan we kijken hoe je data over deze verbinding kan sturen. </p>
+<h2><a class="header" href="#multiplexing" id="multiplexing">Multiplexing</a></h2>
+<p>Alhoewel QUIC op UDP is gebouwd onderstuend het streams.
+A QUIC stream is similar to a TCP stream, but you are not limited to a single stream.
+You can open multiple streams between two peers. 
+This is also called 'multiplexing'.</p>
+<p>Stream multiplexing can have a significant positive effect on the performance of applications if the resources assigned to streams are properly prioritized.
+Multiplexing is also used in the HTTP/2 protocol, but in QUIC it is not handled automatically.
+It is entirely in the hands of the user to deal efficiently with multiplexing.</p>
+<h2><a class="header" href="#stream-types" id="stream-types">Stream Types</a></h2>
+<p>Quinn offers three ways to send your data. 
+Two stream-based and one message-based.</p>
+<table><thead><tr><th align="left">Type</th><th align="left">Description</th><th align="left">Reference</th></tr></thead><tbody>
+<tr><td align="left"><strong>Bidirectional Stream</strong></td><td align="left">two way communication.</td><td align="left">see <code>open_bi</code></td></tr>
+<tr><td align="left"><strong>Unidirectional Stream</strong></td><td align="left">one way communication.</td><td align="left">see <code>open_uni</code></td></tr>
+<tr><td align="left"><strong>Unreliable Messaging</strong></td><td align="left">message based unreliable communication.</td><td align="left">see <code>send_datagram</code></td></tr>
+</tbody></table>
+<p>Soon we will discuss this in more detail with a few more people.</p>
+<h2><a class="header" href="#how-to-use" id="how-to-use">How to Use</a></h2>
+<p>You can open a new stream or read from an existing stream.
+New streams can be created with the methods <code>open_bi</code>, <code>open_uni</code> in <code>NewConnection::connection</code>.
+Existing streams can be found in <code>NewConnection</code>. 
+Both the client and the server are able to open a stream and start sending and receing constrained by the stream type. </p>
+<p><em>Iterate over various opened streams</em></p>
+<pre><pre class="playground"><code class="language-rust">
+<span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>async fn iterate_streams(mut connection: NewConnection) -&gt; anyhow::Result&lt;()&gt; {
+    // Iterate unidirectional streams with only the receiving side.
+    while let Some(Ok(recv)) = connection.uni_streams.next().await { }
+    // Iterate bidirectional streams with both sent and receiving side.
+    while let Some(Ok((sent, recv))) = connection.bi_streams.next().await { }
+    // Iterate arrived datagrams.
+    while let Some(Ok(bytes)) = connection.datagrams.next().await { }
+
+    Ok(())
+}
+<span class="boring">}
+</span></code></pre></pre>
+<p><em>Open different type of streams</em></p>
+<pre><pre class="playground"><code class="language-rust">
+<span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>async fn open_streams(mut connection: Connection) -&gt; anyhow::Result&lt;()&gt; {
+    // Open unidirectional stream.
+    let mut send = connection.
+        open_uni()
+        .await?;
+
+    // Open bidirectional stream.
+    let (send, recv) = connection.
+        open_bi()
+        .await?;
+
+    Ok(())
+}
+<span class="boring">}
+</span></code></pre></pre>
+<h2><a class="header" href="#bidirectional-streams" id="bidirectional-streams">Bidirectional Streams</a></h2>
+<p>With bidirectional streams you can carry data in both directions, for example, client to server and server to client.</p>
+<p><em>open bidirectional stream</em></p>
+<pre><pre class="playground"><code class="language-rust">
+<span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>async fn open_bidirectional_stream(connection: Connection) -&gt; anyhow::Result&lt;()&gt; {
+    let (mut send, recv) = connection.
+        open_bi()
+        .await?;
+
+    send.write_all(b&quot;test&quot;).await?;
+    send.finish().await?;
+    
+    let received = recv.read_to_end(10).await?;
+
+    Ok(())
+}
+<span class="boring">}
+</span></code></pre></pre>
+<p><em>iterate bidirectional stream(s)</em></p>
+<pre><pre class="playground"><code class="language-rust">
+<span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>async fn receive_bidirectional_stream(mut connection: NewConnection) -&gt; anyhow::Result&lt;()&gt; {
+    while let Some(Ok((sent, recv))) = connection.bi_streams.next().await {
+        // Because it is a bidirectional stream, we can both sent and recieve.
+        println!(&quot;request: {:?}&quot;, recv.read_to_end(50).await?);
+
+        send.write_all(b&quot;response&quot;).await?;
+        send.finish().await?;
+    }
+
+    Ok(())
+}
+<span class="boring">}
+</span></code></pre></pre>
+<h2><a class="header" href="#unidirectional-streams" id="unidirectional-streams">Unidirectional Streams</a></h2>
+<p>With unidirectional streams, you can carry data only in one direction, for example, from the initiator of the stream to its peer.</p>
+<p><em>open unidirectional stream</em></p>
+<pre><pre class="playground"><code class="language-rust">
+<span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>async fn open_unidirectional_stream(connection: Connection)-&gt; anyhow::Result&lt;()&gt; {
+    let mut send = connection.
+        open_uni()
+        .await?;
+
+    send.write_all(b&quot;test&quot;).await.unwrap();
+    send.finish().await?;
+
+    Ok(())
+}
+<span class="boring">}
+</span></code></pre></pre>
+<p><em>iterating unidirectional stream(s)</em></p>
+<pre><pre class="playground"><code class="language-rust">
+<span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>async fn receive_unidirectional_stream(mut connection: NewConnection) -&gt; anyhow::Result&lt;()&gt; {
+    while let Some(Ok(recv)) = connection.uni_streams.next().await {
+        // Because it is a unidirectional stream, we can only receive not sent back.
+        println!(&quot;{:?}&quot;, recv.read_to_end(50).await?);
+    }
+
+    Ok(())
+}
+<span class="boring">}
+</span></code></pre></pre>
+<h2><a class="header" href="#unreliable-messaging" id="unreliable-messaging">Unreliable Messaging</a></h2>
+<p>With unreliable messaging you can transfer data <a href="quin/../network-introduction/transport-guarantees.html#unreliable">unreliable</a> over bare UDP.</p>
+<p><em>send datagram</em></p>
+<pre><pre class="playground"><code class="language-rust">
+<span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>async fn sent_unreliable(connection: Connection)-&gt; anyhow::Result&lt;()&gt; {
+    connection.
+        send_datagram(b&quot;test&quot;.into())
+        .await?;
+
+    Ok(())
+}
+<span class="boring">}
+</span></code></pre></pre>
+<p><em>iterating datagram stream(s)</em></p>
+<pre><pre class="playground"><code class="language-rust">
+<span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>async fn receive_datagram(mut connection: NewConnection) -&gt; anyhow::Result&lt;()&gt; {
+    while let Some(Ok(receivedBytes)) = connection.datagrams.next().await {
+        // Because it is a unidirectional stream, we can only receive not sent back.
+        println!(&quot;request: {:?}&quot;, received);
+    }
+
+    Ok(())
+}
+<span class="boring">}
+</span></code></pre></pre>
+<h1><a class="header" href="#quic-introduction" id="quic-introduction">QUIC Introduction</a></h1>
+<p>QUIC is a general-purpose, transport layer, network protocol, built on top of UDP.
+It is still an internet <a href="https://datatracker.ietf.org/doc/draft-ietf-quic-transport/">draft</a> undergoing standardization by the IETF.
+This indicates that it is not yet stabilized. 
+Quinn focuses on satisfying the latest draft but may lag some drafts behind. 
+The fact that it is a draft does not detract from the fact that QUIC is already used by more than half of 
+all connections from Chrome web browsers to Google's servers with increasing adoption in the overall market. </p>
+<p>QUIC aims to be nearly equivalent to a TCP connection. With the goals to improve the performance of connection-oriented web applications, 
+reduce connection and transport latency, and estimate bandwidth for better congestion control. 
+While the intentions of QUIC were original web-oriented, it suits other areas like the game-networking industry very well.</p>
+<h1><a class="header" href="#networking-introduction" id="networking-introduction">Networking Introduction</a></h1>
+<p>The Internet is unreliable, it changes every second, cables can be cut, network congestion can occur, packets can become corrupted, etc. 
+As soon as we send a packet, it can take any road to reach its destination. 
+To assure the end-user of certain transmission guarantees, such as the arrival of parcels, specific protocols are defined.</p>
+<p>There are some established protocols such as TCP, UDP which are supported by all routers, firewalls, servers, and operating systems. 
+Although these protocols are well accepted, this does not mean that they are perfect or serve all areas of interest. 
+QUIC is being created to solve the problems of the modern Internet and the TCP protocol.</p>
+<p>In the next chapter we will take a closer look at the various protocols, their transmission guarantees, and areas of interest. </p>
+<h1><a class="header" href="#transport-guarantees" id="transport-guarantees">Transport Guarantees</a></h1>
+<h1><a class="header" href="#transport-protocols" id="transport-protocols">Transport Protocols</a></h1>
+<p>It is an excellent question to ask what protocol suits your project the most. 
+Different protocols serve different use cases and the wrong protocol can be catastrophic. 
+Before jumping directly into the meat of QUIC, it can be useful to understand its underlying motivations. 
+For those motivations we have to inspect the flaws of TCP and nature of UDP, 
+because QUIC tries to improve the flaws of TCP ontop of UDP.</p>
+<p>If your already familiar with terminologies as IP/TCP/UDP and their <a href="network-introduction/transport-guarantees.html">transport guarantees</a> and differences feel free to skipp this section. 
+For this section we will be using the <a href="https://en.wikipedia.org/wiki/Internet_protocol_suite">Internet protocol suite</a> as a guidance. </p>
+<p><img src="network-introduction/../images/osi-model.png" alt="OSI model" /></p>
+<p>Different layers serve different use cases. 
+For example, the application layer is not responsible for the data transfer while the transport layer is. 
+Both TCP and UDP work on the transport layer while a protocol like QUIC works on the application layer.<br />
+The advantage of this is that routers and firewalls see these protocols as a UDP or TCP instead of QUIC.
+Because no special hardware software is needed, it follows that development can be faster and that adoption can occur in parallel.</p>
+<h2><a class="header" href="#ip---internet-layer" id="ip---internet-layer">IP - Internet Layer</a></h2>
+<p>All communication over the internet is happening ontop of IP (Internet Protocol). 
+The internet protocol works by splitting data into little chunks called datagrams or packets. 
+The chunks are then sent across the internet from one IP address to another.
+However, this protocol transfers packets across the network without any guarantee and it is by nature <a href="network-introduction/transport-guarantees.html#unreliable">unreliable</a>.
+Therefore we need certain specific guarantees. 
+This is exactly were transport protocols, like TCP, UPD, and application protocols, like QUIC, HTTP, come in. </p>
+<h2><a class="header" href="#tcpip-and-udp-comparison---transport-layer" id="tcpip-and-udp-comparison---transport-layer">TCP/IP and UDP Comparison - Transport layer</a></h2>
+<p><strong>TCP:</strong> stands for 'transmission control protocol' and adds certain guarantees ontop of <a href="network-introduction/transport-protocols.html#ip">IP</a>. 
+It forms the backbone for almost everything you do online, from web browsing to IRC to email to file transfer.</p>
+<p><strong>UDP</strong> stands for 'user datagram protocol'  and adds certain guarantees ontop of <a href="network-introduction/transport-protocols.html#ip">IP</a>, but unlike TCP, 
+instead of adding lots of features and complexity, UDP is a very thin layer over IP and is also <a href="network-introduction/transport-guarantees.html#unreliable">unreliable</a> in nature.</p>
+<table><thead><tr><th align="center">Feature</th><th align="center">TCP</th><th align="center">UDP</th></tr></thead><tbody>
+<tr><td align="center"><a href="https://en.wikipedia.org/wiki/Connection-oriented_communication">Connection-Oriented</a></td><td align="center">Yes</td><td align="center">No</td></tr>
+<tr><td align="center"><a href="network-introduction/transport-guarantees.html">Transport Guarantees</a></td><td align="center"><a href="network-introduction/transport-guarantees.html#reliable-ordered">Reliable Ordered</a></td><td align="center"><a href="network-introduction/transport-guarantees.html#unreliable">Unreliable</a></td></tr>
+<tr><td align="center">Packet Transfer</td><td align="center"><a href="https://en.wikipedia.org/wiki/Stream_(computing)">Stream-based</a></td><td align="center">Message based</td></tr>
+<tr><td align="center">Automatic <a href="https://en.wikipedia.org/wiki/IP_fragmentation">fragmentation</a></td><td align="center">Yes</td><td align="center">Yes, but better is to stay below datagram size limit</td></tr>
+<tr><td align="center">Header Size</td><td align="center">20 bytes</td><td align="center">8 bytes</td></tr>
+<tr><td align="center"><a href="https://en.wikipedia.org/wiki/TCP_congestion_control">Control Flow, Congestion Avoidance/Control</a></td><td align="center">Yes</td><td align="center">No</td></tr>
+</tbody></table>
+<h1><a class="header" href="#problems-of-tcp" id="problems-of-tcp">Problems of TCP</a></h1>
+<p>In <a href="network-introduction/transport-protocols.html">the previous section</a> we compared TCP with UDP, now the golden question: Why should we prefer one over the other? 
+One might ask: &quot;Why choose so much uncertainty with UDP when TCP is so reliable and safe?&quot;. 
+That's a good question to ask yourself. 
+To answer that question we will have to delve a little deeper into how TCP works. </p>
+<h2><a class="header" href="#head-of-line-blocking" id="head-of-line-blocking">Head-of-line Blocking</a></h2>
+<p>One of the biggest problem/feature in the TCP protocol is the Head-of-line blocking. 
+It is a convenient feature because it ensures that all packages are sent and arrive in <a href="network-introduction/transport-guarantees.html#ordering-vs-sequencing">order</a>. 
+However, in cases of high throughput (multiplayer game networking) and big load in short time (web page load) this can be catastrophic to your application performance.</p>
+<p>Lets check this animation out to demonstrate the issue:</p>
+<p><img src="network-introduction/../images/hol.gif" alt="Head of line blocking" /> </p>
+<p>This animation shows that if a certain packet drops in transmission, all packets have to wait at the transport layer until it is resent by the other end.
+If the dropped packet is resent and arrived then all packets are freed from the transport layer. </p>
+<p><strong>Multiplayer Game Networking</strong></p>
+<p>Multiplayer action games are based on a constant stream of packets sent at a speed of 10 to 30 packets per second, and for the most part, 
+the data in these packages are so time-sensitive that in most cases only the most recent data is useful.
+You can think of the input of the player, the position of the player, the orientation and speed, and the state of the physical objects in the world.
+If a single packet drops out we can not afford to queue up 10-30 packets a second until the lost packet arrives. 
+This could cause annoying lag behaviour and bad user experience. </p>
+<p><strong>Web Networking</strong></p>
+<p>Gamenetworking is not the only area were this head-of-line blocking plays is a big problem.
+The World Wide Web is a place were quick web-page load speeds are very important (who wants to wait 200ms to long right?).
+As websites grow in size and attention span decreases we need faster loading times for the websites.</p>
+<p>HTTP-2 introduced technique called multiplexing. 
+In short, multiple TCP streams will be setup to communicate with the server if a website loads. 
+Then If one of them blocks the whole website can continue to load seemingly while that single stream is retransmitting.</p>
+<p>We will take a deeper dive into this subject when looking at QUIC multiplexing.</p>
+<h2><a class="header" href="#connection-setup-duration" id="connection-setup-duration">Connection Setup Duration</a></h2>
+<p>In standard HTTP+TLS+TCP, TCP needs a handshake to establish a session between server and client, and TLS needs its own handshake to ensure that the session is secured.</p>
+<p><img src="network-introduction/../images/tcp-handshake.svg.png" alt="TCP-handshake" /></p>
+<p>First, the source sends an SYN “initial request” packet to the target server in order to start the dialogue. 
+Then the target server sends a SYN-ACK packet to agree to the process.
+Lastly, the source sends an ACK packet to the target to confirm the process, after which the message contents can be sent. </p>
+<p>Now if we want to secure the TCP connection, we have to use a protocol like TLS on top of it. 
+If we use an older TLS version &lt; 1.3 then there are three more handshakes that are required.</p>
+<p>You can see how expensive it is to create a TCP connection. In a scenario of TCP and TLS 1.2 with a 100ms latency we need to wait 6 x 100ms = 600ms to set up a connection. 
+If the website is big in size, an additional load time can make the website load over a second into seconds. 
+Which is of course disturbing for our short attention spans. </p>
+<h2><a class="header" href="#requests-in-segment" id="requests-in-segment">Requests in Segment</a></h2>
+<p>TCP segment can only carry a single HTTP/1.1 Request/Response. 
+Consequently it is possible that a large number of small segments are sent within
+an HTTP/1.1 session. This can lead to a large overhead.</p>
+<h2><a class="header" href="#client-connection-initiation" id="client-connection-initiation">Client Connection Initiation</a></h2>
+<p>HTTP/1.1 transfers are always initiated by the client. 
+This decreases the performance of HTTP/1.1 significantly when loading embedded files, because a server has to
+wait for a request from the client, even if the server knows
+that the client needs a specific resource.</p>
 
                     </main>
 

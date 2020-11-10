@@ -1,0 +1,365 @@
+<!DOCTYPE HTML>
+<html lang="en" class="sidebar-visible no-js light">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Cryptography Setup - Quinn</title>
+        
+        
+
+
+        <!-- Custom HTML head -->
+        
+
+
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff" />
+
+        
+        <link rel="icon" href="../favicon.svg">
+        
+        
+        <link rel="shortcut icon" href="../favicon.png">
+        
+        <link rel="stylesheet" href="../css/variables.css">
+        <link rel="stylesheet" href="../css/general.css">
+        <link rel="stylesheet" href="../css/chrome.css">
+        
+        <link rel="stylesheet" href="../css/print.css" media="print">
+        
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="../FontAwesome/css/font-awesome.css">
+        
+        <link rel="stylesheet" href="../fonts/fonts.css">
+        
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="../highlight.css">
+        <link rel="stylesheet" href="../tomorrow-night.css">
+        <link rel="stylesheet" href="../ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+        
+
+        
+    </head>
+    <body>
+        <!-- Provide site root to javascript -->
+        <script type="text/javascript">
+            var path_to_root = "../";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "light";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script type="text/javascript">
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script type="text/javascript">
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('no-js')
+            html.classList.remove('light')
+            html.classList.add(theme);
+            html.classList.add('js');
+        </script>
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script type="text/javascript">
+            var html = document.querySelector('html');
+            var sidebar = 'hidden';
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            }
+            html.classList.remove('sidebar-visible');
+            html.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item expanded "><a href="../quinn.html"><strong aria-hidden="true">1.</strong> QUINN Introduction</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../quin/certificate.html" class="active"><strong aria-hidden="true">1.1.</strong> Cryptography Setup</a></li><li class="chapter-item expanded "><a href="../quin/set-up-connection.html"><strong aria-hidden="true">1.2.</strong> Connection Setup</a></li><li class="chapter-item expanded "><a href="../quin/data-transfer.html"><strong aria-hidden="true">1.3.</strong> Data Transfer</a></li></ol></li><li class="chapter-item expanded "><a href="../quic.html"><strong aria-hidden="true">2.</strong> QUICK Introduction</a></li><li class="chapter-item expanded "><a href="../network-introduction.html"><strong aria-hidden="true">3.</strong> Network Introduction</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../network-introductionransport-guarantees.html"><strong aria-hidden="true">3.1.</strong> Transport Guarantees</a></li><li class="chapter-item expanded "><a href="../network-introduction/transport-protocols.html"><strong aria-hidden="true">3.2.</strong> Transport Protocols</a></li><li class="chapter-item expanded "><a href="../network-introduction/tcp-problems.html"><strong aria-hidden="true">3.3.</strong> Problems of TCP</a></li></ol></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                
+                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky bordered">
+                    <div class="left-buttons">
+                        <button id="sidebar-toggle" class="icon-button" type="button" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </button>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light (default)</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                        
+                    </div>
+
+                    <h1 class="menu-title">Quinn</h1>
+
+                    <div class="right-buttons">
+                        
+                        <a href="../print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+                        
+                        
+                    </div>
+                </div>
+
+                
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" name="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+                
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script type="text/javascript">
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1><a class="header" href="#certificates" id="certificates">Certificates</a></h1>
+<p>A Certificate Authority (CA) is an entity that issues digital certificates. 
+These digital certificates certify the ownership of a public key associated with a host, server, client, document, and more. 
+Digital certificates help to ensure users can trust that your content is actually from a reliable, safe source.</p>
+<p>By default, Quinn clients validate the cryptographic identity of servers they
+connect to. This prevents an active, on-path attacker from intercepting
+messages, but requires trusting some certificate authority and thus some configuration up-front. 
+However, it is possible to use Quinn over an insecure connection or self-sign your certificates. </p>
+<h2><a class="header" href="#insecure-connection" id="insecure-connection">Insecure Connection</a></h2>
+<p>For some cases, including peer-to-peer, trust-on-first-use, deliberately
+insecure applications, or any case where servers are not identified by domain
+name, a certificate isn't practical. Arbitrary certificate validation logic can be
+implemented by enabling the <code>dangerous_configuration</code> feature of <code>rustls</code>. 
+In addition you need to override the certificate verifier by hand in the <code>ClientConfig</code>.</p>
+<p>First, add a <code>rustls</code> dependency with the <code>dangerous_configuration</code> feature flag to your toml file.</p>
+<pre><code class="language-toml">quinn = &quot;*&quot;
+rustls = { version = &quot;*&quot;, features = [&quot;dangerous_configuration&quot;, &quot;quic&quot;] }
+</code></pre>
+<p>Then, you can skip the certificate check on the client by implementing <code>rustls::ServerCertVerifier</code> and let it always return 'correct'.
+After that, we should configure our client to use this certificate verifier. </p>
+<pre><pre class="playground"><code class="language-rust">
+<span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>pub fn insecure() -&gt; ClientConfig {
+    let mut cfg = quinn::ClientConfigBuilder::default().build();
+
+    // Get a mutable reference to the 'crypto' config in the 'client config'..
+    let tls_cfg: &amp;mut rustls::ClientConfig =
+        std::sync::Arc::get_mut(&amp;mut cfg.crypto).unwrap();
+
+    // Change the certification verifier.
+    // This is only available when compiled with 'dangerous_configuration' feature.
+    tls_cfg
+        .dangerous()
+        .set_certificate_verifier(Arc::new(SkipCertificationVerification));
+    cfg
+}
+<span class="boring">}
+</span></code></pre></pre>
+<p>Now, if you throw this <code>ClientConfig</code> into the <code>Endpoint::default_client_config()</code> your endpoint should verify all connections as trustworthy.</p>
+<h2><a class="header" href="#using-certificates" id="using-certificates">Using Certificates</a></h2>
+<p>In this section we look at how to create a certificate for Quinn. 
+First we deal with the self-signed certificate, and after that the real certificates.</p>
+<p>There are two common types of certificate formats. Those are <code>.pem</code> and <code>.der</code>.
+The <code>.der</code> certificates are byte encoded while <code>.pem</code> are text encoded.<br />
+You can convert on to the other by using tooling such as openssl or also withing code its self as demonstrated below. </p>
+<p>Let's define two useful function that can dissect byte certificates and return nice instances of structures. </p>
+<pre><pre class="playground"><code class="language-rust">
+<span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>pub fn parse_der(cert: Vec&lt;u8&gt;, private_key: Vec&lt;u8&gt;) -&gt; anyhow::Result&lt;(quinn::Certificate, quinn::PrivateKey)&gt; {
+    let cert = quinn::Certificate::from_der(&amp;cert)?;
+    let key = quinn::PrivateKey::from_der(&amp;private_key)?;
+    Ok((cert, key))
+}
+
+pub fn parse_pem(cert: Vec&lt;u8&gt;, private_key: Vec&lt;u8&gt;) -&gt; anyhow::Result&lt;(quinn::Certificate, quinn::PrivateKey)&gt; {
+    // Parse to certificate chain whereafter taking the first certificate in this chain.
+    let cert = quinn::CertificateChain::from_pem(&amp;cert)?.iter().next().unwrap().clone();
+    let key = quinn::PrivateKey::from_pem(&amp;private_key)?;
+
+    Ok((quinn::Certificate::from(cert), key))
+}
+<span class="boring">}
+</span></code></pre></pre>
+<h3><a class="header" href="#self-signed" id="self-signed">Self Signed</a></h3>
+<p>Sometimes working with your own certificate authority makes no sense, then you can use self-signed certificates. 
+For this purpose [rcgen][rcgen] can be used.
+You need to write the certificate to permanent storage for later reuse.
+Notice that <code>generate_simple_self_signed</code> supports both <code>.der</code> and <code>.pem</code> formatting.</p>
+<p>Let's look at an example:</p>
+<pre><pre class="playground"><code class="language-rust">
+<span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>pub fn generate_self_signed_cert(cert_path: &amp;str, key_path: &amp;str) -&gt; anyhow::Result&lt;(quinn::Certificate, quinn::PrivateKey)&gt; {
+    // Generate dummy certificate.
+    let certificate = rcgen::generate_simple_self_signed(vec![&quot;localhost&quot;.into()]).unwrap();
+    let serialized_key = certificate.serialize_private_key_der();
+    let serialized_certificate = certificate.serialize_der().unwrap();
+
+    // Write to files.
+    fs::write(&amp;cert_path, &amp;serialized_certificate).context(&quot;failed to write certificate&quot;)?;
+    fs::write(&amp;key_path, &amp;serialized_key).context(&quot;failed to write private key&quot;)?;
+
+    parse_der(serialized_certificate, serialized_key)
+}
+<span class="boring">}
+</span></code></pre></pre>
+<h3><a class="header" href="#official-certificates" id="official-certificates">Official Certificates</a></h3>
+<p>Let’s Encrypt is a CA and gives out certificates for free. 
+Its a very well-known CA used for many applications around the world.
+We can cover a full lets-encrypt tutorial here but instead I am going to keep it short. 
+There is plenty of documentation out there which keeps itself up-to-date. </p>
+<p><strong>Generate Certificate</strong></p>
+<p>Official certificates can be requested from an organization such as <a href="https://letsencrypt.org/getting-started/">Let's Encrypt</a>.
+Let's Encrypt works together with <a href="https://certbot.eff.org/instructions">Certbot</a> who will generate the certificate for you.
+Because we generate a certificate for a protocol we assume that you are not using a web server.
+Select on the certbot website that you do not have a web server and follow the given installation instructions.</p>
+<p>If certbot is installed, run <code>certbot certonly --standalone</code>, this option assumes that you do not have a web server installed and will therefore run a web server during the process.
+After entering your information and domain addresses two <code>.pem</code> files, namely: Con <code>cert.pem</code> and <code>privkey.pem</code> will be generated.
+As soon as they are generated, copy them to your project. </p>
+<pre><pre class="playground"><code class="language-rust">
+<span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>// Read from certificate and key from directory. 
+let (cert, key) = fs::read(&amp;&quot;./cert.pem&quot;).and_then(|x| Ok((x, fs::read(&amp;&quot;./privkey.pem&quot;)?)))?;
+// Parse bytes to type.
+parse_pem(cert, key)
+<span class="boring">}
+</span></code></pre></pre>
+<h3><a class="header" href="#configuring-certificates" id="configuring-certificates">Configuring Certificates</a></h3>
+<p>When you generated the certificate it needs to be configured into the client and server. 
+<code>certificate</code> is of type <code>Certificate</code> and <code>key</code> of type <code>PrivateKey</code>.</p>
+<p><strong>Configure Server</strong></p>
+<pre><pre class="playground"><code class="language-rust">
+<span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>let mut builder = ServerConfigBuilder::default();
+builder.certificate(CertificateChain::from_certs(vec![certificate]), key)?;
+<span class="boring">}
+</span></code></pre></pre>
+<p><strong>Configure Client</strong></p>
+<pre><pre class="playground"><code class="language-rust">
+<span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>let mut builder = ClientConfigBuilder::default();
+builder.add_certificate_authority(certificate)?;    
+<span class="boring">}
+</span></code></pre></pre>
+<p>If done well, your endpoint should be encrypted.</p>
+<p><a href="set-up-connection.html">Nextup</a>, we will have a take on how to setup the connection.</p>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                        
+                            <a rel="prev" href="../quinn.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+                        
+
+                        
+                            <a rel="next" href="../quin/set-up-connection.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+                        
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                
+                    <a rel="prev" href="../quinn.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+                
+
+                
+                    <a rel="next" href="../quin/set-up-connection.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+                
+            </nav>
+
+        </div>
+
+        
+
+        
+
+        
+
+        
+        <script type="text/javascript">
+            window.playground_copyable = true;
+        </script>
+        
+
+        
+
+        
+        <script src="../elasticlunr.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../mark.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../searcher.js" type="text/javascript" charset="utf-8"></script>
+        
+
+        <script src="../clipboard.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../highlight.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../book.js" type="text/javascript" charset="utf-8"></script>
+
+        <!-- Custom JS scripts -->
+        
+
+        
+
+    </body>
+</html>
