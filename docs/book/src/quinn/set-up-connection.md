@@ -1,13 +1,14 @@
 # Connection Setup
 
-In het [vorige hoofdstuk](certificate.md) is gekeken hoe we een certificaat kunnen configureren, dit aspect wordt daarom hier achterwege gelaten. 
-In dit hoofstuk wordt toegelicht hoe een connectie opgezet wordt.
+In the [previous chapter](certificate.md) we looked at how to configure a certificate, this aspect is therefore omitted here. 
+This chapter explains how to set up a connection and prepare it for data transfer. 
+However, sending and receiving data is discussed in the [next chapter](data-transfer.md). 
 
-Een Quinn connectie kan opgezet worden met de `Endpoint` struct, dit is tevens de entry van de library. 
+It all starts with the `Endpoint` struct, this is the entry of the library. 
 
 ## Example
 
-Laten we beginnen met het defineren van wat constanten. 
+Let's start by defining some constants. 
 
 ```rust
 static SERVER_NAME: &str = "localhost";
@@ -21,17 +22,17 @@ fn server_addr() -> SocketAddr {
 }
 ```   
 
-Voor zowel een server als client maken we gebruik van de `EndpointBuilder`. 
-De `EndpointBuilder` heeft een methode `EndpointBuider::bind(address)` waarmee je een address koppelt aan de endpoint. 
-Deze methode initializeerd een UDP-socket die quinn gebruikt.
-Daarnaast is het ook mogelijk om vanaf een bestaande socket een quinn endpoint te initialiseren. 
-Dit kan met de `EndpointBuider::with_socket` methode.
+For both the server and the client we use the `EndpointBuilder`. 
+The `EndpointBuilder` has a method `EndpointBuider::bind(address)` with which you link an address to the endpoint. 
+This method initializes a UDP-socket that is used by quinn.
+If you need more control over the socket creation, it is also possible to initialize a quinn endpoint with an existing UDP socket. 
+For this use the method `EndpointBuider::with_socket`.
 
 **Client**
 
-Net als een TCP-client dien je een verbinding met een destination te maken. 
-In quinn kan dit met de methode `connect()`. 
-De `connect` methode heeft een argument 'servernaam', dit is de naam die in het certificaat staat. 
+Just like with a TCP client, you need to connect to a destination. 
+In quinn you can do this with the method `connect()`. 
+The `connect` method has an argument 'server name', this is the name that is in the certificate. 
 
 ```rust
 async fn client() -> anyhow::Result<()> {
@@ -53,9 +54,9 @@ async fn client() -> anyhow::Result<()> {
 
 **Server**
 
-Net als een TCP Listener dien je naar inkomende connecties te luisteren. 
-Voor dat je kan luisteren naar connecties moet je met de `EndpointBuilder` de `Endpoint` als server configureren.  
-Let er op dat de configuratie zelf geen luister logica uitvoert, dit kan pas als je `bind()` hebt uitgevoert.  
+Just like a TCP Listener, you have to listen to incoming connections. 
+Before you can listen to connections you need to configure the `EndpointBuilder` as a server.  
+Note that the configuration itself does not perform any listening logic, this can only be done after you have run `bind()`.  
 
 ```rust
 async fn server() -> anyhow::Result<()> {

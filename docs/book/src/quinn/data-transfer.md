@@ -1,14 +1,13 @@
 # Data Transfer
-In het [vorige hoofdstuk](set-up-connection.md) hebben we gekenen hoe je een `Endpoint` kan opzetten 
-en vervolgens toegang kan krijgen tot een `NewConnectie` instantie.
-Nu gaan we kijken hoe je data over deze verbinding kan sturen. 
+In the [previous chapter](set-up-connection.md) we characterized how to set up an `Endpoint` 
+and then get access to a `NewConnection` instance.
+Now we will continue with the subject of sending data over this connection.
 
 ## Multiplexing
 
-Alhoewel QUIC op UDP is gebouwd onderstuend het streams.
-A QUIC stream is similar to a TCP stream, but you are not limited to a single stream.
-You can open multiple streams between two peers. 
-This is also called 'multiplexing'.
+Though QUIC is built on UDP it is stream-based.
+A QUIC stream could be compared to a TCP stream, however you are not limited to a single stream. 
+You can open multiple streams between two peers which is also called multiplexing.
 
 Stream multiplexing can have a significant positive effect on the performance of applications if the resources assigned to streams are properly prioritized.
 Multiplexing is also used in the HTTP/2 protocol, but in QUIC it is not handled automatically.
@@ -21,18 +20,18 @@ Two stream-based and one message-based.
 
 | Type | Description | Reference |
 | :----- | :----- | :----- |
-| **Bidirectional Stream** | two way communication. | see `open_bi` |
-| **Unidirectional Stream** | one way communication. | see `open_uni` |
+| **Bidirectional Stream** | two way stream communication. | see `open_bi` |
+| **Unidirectional Stream** | one way stream communication. | see `open_uni` |
 | **Unreliable Messaging** | message based unreliable communication. | see `send_datagram` |
 
 Soon we will discuss this in more detail with a few more people.   
 
 ## How to Use
 
-You can open a new stream or read from an existing stream.
+You can open a new stream or read from an existing stream of data.
 New streams can be created with the methods `open_bi`, `open_uni` in `NewConnection::connection`.
 Existing streams can be found in `NewConnection`. 
-Both the client and the server are able to open a stream and start sending and receing constrained by the stream type. 
+Both the client and the server are able to open a stream and send or receive data from it. 
 
 
 *Iterate over various opened streams*
@@ -50,7 +49,7 @@ async fn iterate_streams(mut connection: NewConnection) -> anyhow::Result<()> {
 }
 ```
 
-*Open different type of streams*
+*Open different types of streams*
 
 ```rust
 async fn open_streams(mut connection: Connection) -> anyhow::Result<()> {
