@@ -95,7 +95,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded "><a href="../quinn.html"><strong aria-hidden="true">1.</strong> QUINN Introduction</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../quinn/introduction.html"><strong aria-hidden="true">1.1.</strong> Overview</a></li><li class="chapter-item expanded "><a href="../quinn/certificate.html"><strong aria-hidden="true">1.2.</strong> Cryptography Setup</a></li><li class="chapter-item expanded "><a href="../quinn/set-up-connection.html"><strong aria-hidden="true">1.3.</strong> Connection Setup</a></li><li class="chapter-item expanded "><a href="../quinn/data-transfer.html"><strong aria-hidden="true">1.4.</strong> Data Transfer</a></li></ol></li><li class="chapter-item expanded "><a href="../quic.html"><strong aria-hidden="true">2.</strong> QUICK Introduction</a></li><li class="chapter-item expanded "><a href="../network-introduction.html"><strong aria-hidden="true">3.</strong> Network Introduction</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../network-introduction/transport-guarantees.html"><strong aria-hidden="true">3.1.</strong> Transport Guarantees</a></li><li class="chapter-item expanded "><a href="../network-introduction/transport-protocols.html"><strong aria-hidden="true">3.2.</strong> Transport Protocols</a></li><li class="chapter-item expanded "><a href="../network-introduction/tcp-problems.html" class="active"><strong aria-hidden="true">3.3.</strong> Problems of TCP</a></li></ol></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded "><a href="../network-introduction.html"><strong aria-hidden="true">1.</strong> Network Introduction</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../network-introduction/transport-guarantees.html"><strong aria-hidden="true">1.1.</strong> Transport Guarantees</a></li><li class="chapter-item expanded "><a href="../network-introduction/transport-protocols.html"><strong aria-hidden="true">1.2.</strong> Transport Protocols</a></li><li class="chapter-item expanded "><a href="../network-introduction/tcp-problems.html" class="active"><strong aria-hidden="true">1.3.</strong> Problems of TCP</a></li></ol></li><li class="chapter-item expanded "><a href="../quinn.html"><strong aria-hidden="true">2.</strong> QUINN Introduction</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../quinn/introduction.html"><strong aria-hidden="true">2.1.</strong> Overview</a></li><li class="chapter-item expanded "><a href="../quinn/certificate.html"><strong aria-hidden="true">2.2.</strong> Cryptography Setup</a></li><li class="chapter-item expanded "><a href="../quinn/set-up-connection.html"><strong aria-hidden="true">2.3.</strong> Connection Setup</a></li><li class="chapter-item expanded "><a href="../quinn/data-transfer.html"><strong aria-hidden="true">2.4.</strong> Data Transfer</a></li></ol></li><li class="chapter-item expanded "><a href="../quic.html"><strong aria-hidden="true">3.</strong> QUICK Introduction</a></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -164,7 +164,8 @@
                 <div id="content" class="content">
                     <main>
                         <h1><a class="header" href="#problems-of-tcp" id="problems-of-tcp">Problems of TCP</a></h1>
-<p>In <a href="transport-protocols.html">the previous section</a> we compared TCP with UDP, now the golden question: Why should we prefer one over the other? 
+<p>In <a href="transport-protocols.html">the previous section</a> we compared TCP with UDP, now the golden question: 
+Why should we prefer one over the other? 
 One might ask: &quot;Why choose so much uncertainty with UDP when TCP is so reliable and safe?&quot;. 
 That's a good question to ask yourself. 
 To answer that question we will have to delve a little deeper into how TCP works. </p>
@@ -172,39 +173,41 @@ To answer that question we will have to delve a little deeper into how TCP works
 <p>One of the biggest problem/feature in the TCP protocol is the Head-of-line blocking. 
 It is a convenient feature because it ensures that all packages are sent and arrive in <a href="transport-guarantees.html#ordering-vs-sequencing">order</a>. 
 However, in cases of high throughput (multiplayer game networking) and big load in short time (web page load) this can be catastrophic to your application performance.</p>
-<p>Lets check this animation out to demonstrate the issue:</p>
+<p>Lets check this animation to demonstrate the issue:</p>
 <p><img src="../images/hol.gif" alt="Head of line blocking" /> </p>
 <p>This animation shows that if a certain packet drops in transmission, all packets have to wait at the transport layer until it is resent by the other end.
 If the dropped packet is resent and arrived then all packets are freed from the transport layer. </p>
+<p>Lets look at two areas were this head-of-line blocking issue is a huge deal.</p>
 <p><strong>Multiplayer Game Networking</strong></p>
-<p>Multiplayer action games are based on a constant stream of packets sent at a speed of 10 to 30 packets per second, and for the most part, 
-the data in these packages are so time-sensitive that in most cases only the most recent data is useful.
-You can think of the input of the player, the position of the player, the orientation and speed, and the state of the physical objects in the world.
-If a single packet drops out we can not afford to queue up 10-30 packets a second until the lost packet arrives. 
+<p>Multiplayer action games are based on a constant stream of packets sent at a speed of 10 to 30 packets per second.
+For the most part, the data in these packages are so time-sensitive that only the most recent data is useful.
+You can think of the input and position of the player, the orientation and speed, and the state of the physical objects in the world.
+If a single packet drops out we can not afford to queue up 10-30 packets a second until the lost packet is retransmitted. 
 This could cause annoying lag behaviour and bad user experience. </p>
 <p><strong>Web Networking</strong></p>
-<p>Gamenetworking is not the only area were this head-of-line blocking plays is a big problem.
+<p>Gamenetworking is not the only area were this head-of-line blocking is a big issue.
 The World Wide Web is a place were quick web-page load speeds are very important (who wants to wait 200ms to long right?).
-As websites grow in size and attention span decreases we need faster loading times for the websites.</p>
+As websites get bigger and attention decreases, we need faster loading times for websites.</p>
 <p>HTTP-2 introduced technique called multiplexing. 
-In short, multiple TCP streams will be setup to communicate with the server if a website loads. 
+In short, this means that multiple TCP streams will be setup to communicate with the server if a website loads. 
 Then If one of them blocks the whole website can continue to load seemingly while that single stream is retransmitting.</p>
 <p>We will take a deeper dive into this subject when looking at QUIC multiplexing.</p>
 <h2><a class="header" href="#connection-setup-duration" id="connection-setup-duration">Connection Setup Duration</a></h2>
-<p>In standard HTTP+TLS+TCP, TCP needs a handshake to establish a session between server and client, and TLS needs its own handshake to ensure that the session is secured.</p>
+<p>In standard HTTP+TLS+TCP stack, TCP needs a handshake to establish a session between server and client, and TLS needs its own handshake to ensure that the session is secured.</p>
 <p><img src="../images/tcp-handshake.svg.png" alt="TCP-handshake" /></p>
-<p>First, the source sends an SYN “initial request” packet to the target server in order to start the dialogue. 
-Then the target server sends a SYN-ACK packet to agree to the process.
-Lastly, the source sends an ACK packet to the target to confirm the process, after which the message contents can be sent. </p>
+<p>First, the source sends an 'SYN initial request' packet to the target server in order to start the dialogue. 
+Then the target server sends a 'SYN-ACK packet' to agree to the process.
+Lastly, the source sends an 'ACK packet' to the target to confirm the process, after which the message exchange can start. </p>
 <p>Now if we want to secure the TCP connection, we have to use a protocol like TLS on top of it. 
-If we use an older TLS version &lt; 1.3 then there are three more handshakes that are required.</p>
-<p>You can see how expensive it is to create a TCP connection. In a scenario of TCP and TLS 1.2 with a 100ms latency we need to wait 6 x 100ms = 600ms to set up a connection. 
-If the website is big in size, an additional load time can make the website load over a second into seconds. 
-Which is of course disturbing for our short attention spans. </p>
+If we use an older TLS version &lt; 1.3 then there are three more handshake messages required.</p>
+<p>You can see how expensive it is to create a secure TCP connection. 
+In a scenario of TCP and TLS 1.2 with a 100ms latency we need to wait 6 x 100ms = 600ms to set up a connection. 
+If the website is big in size, an additional load time can make the website load over a second. 
+This, of course, is disturbing for our short attention spans. </p>
 <h2><a class="header" href="#requests-in-segment" id="requests-in-segment">Requests in Segment</a></h2>
-<p>TCP segment can only carry a single HTTP/1.1 Request/Response. 
+<p>A TCP segment can only carry a single HTTP/1.1 Request/Response. 
 Consequently it is possible that a large number of small segments are sent within
-an HTTP/1.1 session. This can lead to a large overhead.</p>
+an HTTP/1.1 session which can lead to overhead.</p>
 <h2><a class="header" href="#client-connection-initiation" id="client-connection-initiation">Client Connection Initiation</a></h2>
 <p>HTTP/1.1 transfers are always initiated by the client. 
 This decreases the performance of HTTP/1.1 significantly when loading embedded files, because a server has to
@@ -222,6 +225,10 @@ that the client needs a specific resource.</p>
                         
 
                         
+                            <a rel="next" href="../quinn.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+                        
 
                         <div style="clear: both"></div>
                     </nav>
@@ -235,6 +242,10 @@ that the client needs a specific resource.</p>
                     </a>
                 
 
+                
+                    <a rel="next" href="../quinn.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
                 
             </nav>
 

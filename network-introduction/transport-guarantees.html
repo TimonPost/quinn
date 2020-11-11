@@ -95,7 +95,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded "><a href="../quinn.html"><strong aria-hidden="true">1.</strong> QUINN Introduction</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../quinn/introduction.html"><strong aria-hidden="true">1.1.</strong> Overview</a></li><li class="chapter-item expanded "><a href="../quinn/certificate.html"><strong aria-hidden="true">1.2.</strong> Cryptography Setup</a></li><li class="chapter-item expanded "><a href="../quinn/set-up-connection.html"><strong aria-hidden="true">1.3.</strong> Connection Setup</a></li><li class="chapter-item expanded "><a href="../quinn/data-transfer.html"><strong aria-hidden="true">1.4.</strong> Data Transfer</a></li></ol></li><li class="chapter-item expanded "><a href="../quic.html"><strong aria-hidden="true">2.</strong> QUICK Introduction</a></li><li class="chapter-item expanded "><a href="../network-introduction.html"><strong aria-hidden="true">3.</strong> Network Introduction</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../network-introduction/transport-guarantees.html" class="active"><strong aria-hidden="true">3.1.</strong> Transport Guarantees</a></li><li class="chapter-item expanded "><a href="../network-introduction/transport-protocols.html"><strong aria-hidden="true">3.2.</strong> Transport Protocols</a></li><li class="chapter-item expanded "><a href="../network-introduction/tcp-problems.html"><strong aria-hidden="true">3.3.</strong> Problems of TCP</a></li></ol></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded "><a href="../network-introduction.html"><strong aria-hidden="true">1.</strong> Network Introduction</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../network-introduction/transport-guarantees.html" class="active"><strong aria-hidden="true">1.1.</strong> Transport Guarantees</a></li><li class="chapter-item expanded "><a href="../network-introduction/transport-protocols.html"><strong aria-hidden="true">1.2.</strong> Transport Protocols</a></li><li class="chapter-item expanded "><a href="../network-introduction/tcp-problems.html"><strong aria-hidden="true">1.3.</strong> Problems of TCP</a></li></ol></li><li class="chapter-item expanded "><a href="../quinn.html"><strong aria-hidden="true">2.</strong> QUINN Introduction</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../quinn/introduction.html"><strong aria-hidden="true">2.1.</strong> Overview</a></li><li class="chapter-item expanded "><a href="../quinn/certificate.html"><strong aria-hidden="true">2.2.</strong> Cryptography Setup</a></li><li class="chapter-item expanded "><a href="../quinn/set-up-connection.html"><strong aria-hidden="true">2.3.</strong> Connection Setup</a></li><li class="chapter-item expanded "><a href="../quinn/data-transfer.html"><strong aria-hidden="true">2.4.</strong> Data Transfer</a></li></ol></li><li class="chapter-item expanded "><a href="../quic.html"><strong aria-hidden="true">3.</strong> QUICK Introduction</a></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -164,9 +164,9 @@
                 <div id="content" class="content">
                     <main>
                         <h1><a class="header" href="#transport-guarantees" id="transport-guarantees">Transport Guarantees</a></h1>
-<p>Before diving into any protocol specifics, lets define some terminology that is often used while talking about protocols.
-The protocols that we will be discussing share some combinations of 'transport guarantees'. 
-In your protocol selection you must clearly have in mind what it that you need.</p>
+<p>Let's start by defining terminology that is often used when it comes to protocols. 
+There are 'transport guarantees' such as the order at which packets arrive, 
+and regulation of packet corruption, duplication, and dropping. </p>
 <h2><a class="header" href="#ordering-vs-sequencing" id="ordering-vs-sequencing">Ordering VS Sequencing</a></h2>
 <p>Packet arrival is possible in two ways. 
 They can arrive in sequence and in order. </p>
@@ -180,7 +180,6 @@ They can arrive in sequence and in order. </p>
 <li>Sequencing: Only the newest items will be passed trough e.g. <code>1,3,2,5,4</code> which results in <code>1,3,5</code>.</li>
 <li>Ordering: All items are returned in order <code>1,3,2,5,4</code> which results in <code>1,2,3,4,5</code>.</li>
 </ul>
-<p>Now, lets discuss those different transport guarantees a protocol can have. </p>
 <h2><a class="header" href="#the-5-transport-guarantees" id="the-5-transport-guarantees">The 5 Transport Guarantees</a></h2>
 <p>There are 5 main different ways you can transfer data:</p>
 <table><thead><tr><th align="center">Transport Guarantees</th><th align="center">Packet Drop <a href="https://en.wikipedia.org/wiki/Packet_loss">(1)</a></th><th align="center">Packet Duplication <a href="https://observersupport.viavisolutions.com/html_doc/current/index.html#page/gigastor_hw/packet_deduplicating.html">(2)</a></th><th align="center">Packet Order <a href="#ordering-vs-sequencing">(3)</a></th><th align="center">Packet Delivery</th></tr></thead><tbody>
@@ -190,11 +189,15 @@ They can arrive in sequence and in order. </p>
 <tr><td align="center"><strong>Reliable Ordered</strong></td><td align="center">No</td><td align="center">No</td><td align="center">Ordered</td><td align="center">Yes</td></tr>
 <tr><td align="center"><strong>Reliable Sequenced</strong></td><td align="center">Only old</td><td align="center">No</td><td align="center">Sequenced</td><td align="center">Only newest</td></tr>
 </tbody></table>
-<p>UDP is unreliable, while TCP is reliable.
-Reliability gives great uncertainty with a lot of freedom, while reliability gives great certainty with costs in speed and freedom.
-That is why protocols such as QUIC, RUDP, SCTP, QUIC, netcode, laminar build on UDP instead of TCP. 
-UDP has far fewer limitations that give the end user more control over the transmission. 
-A big factor for to consider are the required transport guarantees needed for your usecases. </p>
+<p>Unreliability gives great uncertainty with a lot of freedom, while reliability gives great certainty with costs in speed and freedom.
+That is why protocols such as QUIC, RUDP, SCTP, QUIC, netcode, laminar are build on UDP instead of TCP. 
+UDP gives the end user more control over the transmission then TCP is able to do. More on this <a href="transport-protocols.html">later</a>.</p>
+<p>Sometimes you hear fierce discussions about why one protocol is better than the other, 
+but I think we should start looking at what protocol has what purposes.
+The key is that a combination of these guarantees are needed for different use cases. 
+It is therefore important that you check for your scenario which one you need. </p>
+<p><br><hr></p>
+<p><a href="transport-protocols.html">Nextup</a>, we will apply this concept of transport guarantees to TCP and UDP.</p>
 
                     </main>
 

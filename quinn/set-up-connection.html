@@ -95,7 +95,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded "><a href="../quinn.html"><strong aria-hidden="true">1.</strong> QUINN Introduction</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../quinn/introduction.html"><strong aria-hidden="true">1.1.</strong> Overview</a></li><li class="chapter-item expanded "><a href="../quinn/certificate.html"><strong aria-hidden="true">1.2.</strong> Cryptography Setup</a></li><li class="chapter-item expanded "><a href="../quinn/set-up-connection.html" class="active"><strong aria-hidden="true">1.3.</strong> Connection Setup</a></li><li class="chapter-item expanded "><a href="../quinn/data-transfer.html"><strong aria-hidden="true">1.4.</strong> Data Transfer</a></li></ol></li><li class="chapter-item expanded "><a href="../quic.html"><strong aria-hidden="true">2.</strong> QUICK Introduction</a></li><li class="chapter-item expanded "><a href="../network-introduction.html"><strong aria-hidden="true">3.</strong> Network Introduction</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../network-introduction/transport-guarantees.html"><strong aria-hidden="true">3.1.</strong> Transport Guarantees</a></li><li class="chapter-item expanded "><a href="../network-introduction/transport-protocols.html"><strong aria-hidden="true">3.2.</strong> Transport Protocols</a></li><li class="chapter-item expanded "><a href="../network-introduction/tcp-problems.html"><strong aria-hidden="true">3.3.</strong> Problems of TCP</a></li></ol></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded "><a href="../network-introduction.html"><strong aria-hidden="true">1.</strong> Network Introduction</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../network-introduction/transport-guarantees.html"><strong aria-hidden="true">1.1.</strong> Transport Guarantees</a></li><li class="chapter-item expanded "><a href="../network-introduction/transport-protocols.html"><strong aria-hidden="true">1.2.</strong> Transport Protocols</a></li><li class="chapter-item expanded "><a href="../network-introduction/tcp-problems.html"><strong aria-hidden="true">1.3.</strong> Problems of TCP</a></li></ol></li><li class="chapter-item expanded "><a href="../quinn.html"><strong aria-hidden="true">2.</strong> QUINN Introduction</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../quinn/introduction.html"><strong aria-hidden="true">2.1.</strong> Overview</a></li><li class="chapter-item expanded "><a href="../quinn/certificate.html"><strong aria-hidden="true">2.2.</strong> Cryptography Setup</a></li><li class="chapter-item expanded "><a href="../quinn/set-up-connection.html" class="active"><strong aria-hidden="true">2.3.</strong> Connection Setup</a></li><li class="chapter-item expanded "><a href="../quinn/data-transfer.html"><strong aria-hidden="true">2.4.</strong> Data Transfer</a></li></ol></li><li class="chapter-item expanded "><a href="../quic.html"><strong aria-hidden="true">3.</strong> QUICK Introduction</a></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -164,11 +164,12 @@
                 <div id="content" class="content">
                     <main>
                         <h1><a class="header" href="#connection-setup" id="connection-setup">Connection Setup</a></h1>
-<p>In het <a href="certificate.html">vorige hoofdstuk</a> is gekeken hoe we een certificaat kunnen configureren, dit aspect wordt daarom hier achterwege gelaten. 
-In dit hoofstuk wordt toegelicht hoe een connectie opgezet wordt.</p>
-<p>Een Quinn connectie kan opgezet worden met de <code>Endpoint</code> struct, dit is tevens de entry van de library. </p>
+<p>In the <a href="certificate.html">previous chapter</a> we looked at how to configure a certificate, this aspect is therefore omitted here. 
+This chapter explains how to set up a connection and prepare it for data transfer. 
+However, sending and receiving data is discussed in the <a href="data-transfer.html">next chapter</a>. </p>
+<p>It all starts with the <code>Endpoint</code> struct, this is the entry of the library. </p>
 <h2><a class="header" href="#example" id="example">Example</a></h2>
-<p>Laten we beginnen met het defineren van wat constanten. </p>
+<p>Let's start by defining some constants. </p>
 <pre><pre class="playground"><code class="language-rust">
 <span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
@@ -183,15 +184,15 @@ fn server_addr() -&gt; SocketAddr {
 }
 <span class="boring">}
 </span></code></pre></pre>
-<p>Voor zowel een server als client maken we gebruik van de <code>EndpointBuilder</code>. 
-De <code>EndpointBuilder</code> heeft een methode <code>EndpointBuider::bind(address)</code> waarmee je een address koppelt aan de endpoint. 
-Deze methode initializeerd een UDP-socket die quinn gebruikt.
-Daarnaast is het ook mogelijk om vanaf een bestaande socket een quinn endpoint te initialiseren. 
-Dit kan met de <code>EndpointBuider::with_socket</code> methode.</p>
+<p>For both the server and the client we use the <code>EndpointBuilder</code>. 
+The <code>EndpointBuilder</code> has a method <code>EndpointBuider::bind(address)</code> with which you link an address to the endpoint. 
+This method initializes a UDP-socket that is used by quinn.
+If you need more control over the socket creation, it is also possible to initialize a quinn endpoint with an existing UDP socket. 
+For this use the method <code>EndpointBuider::with_socket</code>.</p>
 <p><strong>Client</strong></p>
-<p>Net als een TCP-client dien je een verbinding met een destination te maken. 
-In quinn kan dit met de methode <code>connect()</code>. 
-De <code>connect</code> methode heeft een argument 'servernaam', dit is de naam die in het certificaat staat. </p>
+<p>Just like with a TCP client, you need to connect to a destination. 
+In quinn you can do this with the method <code>connect()</code>. 
+The <code>connect</code> method has an argument 'server name', this is the name that is in the certificate. </p>
 <pre><pre class="playground"><code class="language-rust">
 <span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
@@ -213,9 +214,9 @@ De <code>connect</code> methode heeft een argument 'servernaam', dit is de naam 
 <span class="boring">}
 </span></code></pre></pre>
 <p><strong>Server</strong></p>
-<p>Net als een TCP Listener dien je naar inkomende connecties te luisteren. 
-Voor dat je kan luisteren naar connecties moet je met de <code>EndpointBuilder</code> de <code>Endpoint</code> als server configureren.<br />
-Let er op dat de configuratie zelf geen luister logica uitvoert, dit kan pas als je <code>bind()</code> hebt uitgevoert.</p>
+<p>Just like a TCP Listener, you have to listen to incoming connections. 
+Before you can listen to connections you need to configure the <code>EndpointBuilder</code> as a server.<br />
+Note that the configuration itself does not perform any listening logic, this can only be done after you have run <code>bind()</code>.</p>
 <pre><pre class="playground"><code class="language-rust">
 <span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
