@@ -1,6 +1,7 @@
 # Data Transfer
-In the [previous chapter](set-up-connection.md) we characterized how to set up an `Endpoint` 
-and then get access to a `NewConnection` instance.
+
+In the [previous chapter](set-up-connection.md) we characterized how to set up an [Endpoint][Endpoint]
+and then get access to a [NewConnection][NewConnection] instance.
 Now we will continue with the subject of sending data over this connection.
 
 ## Multiplexing
@@ -20,17 +21,17 @@ Two stream-based and one message-based.
 
 | Type | Description | Reference |
 | :----- | :----- | :----- |
-| **Bidirectional Stream** | two way stream communication. | see `open_bi` |
-| **Unidirectional Stream** | one way stream communication. | see `open_uni` |
-| **Unreliable Messaging** | message based unreliable communication. | see `send_datagram` |
+| **Bidirectional Stream** | two way stream communication. | see [open_bi][open_bi] |
+| **Unidirectional Stream** | one way stream communication. | see [open_uni][open_uni] |
+| **Unreliable Messaging** | message based unreliable communication. | see [send_datagram][send_datagram] |
 
 Soon we will discuss this in more detail with a few more people.   
 
 ## How to Use
 
 You can open a new stream or read from an existing stream of data.
-New streams can be created with the methods `open_bi`, `open_uni` in `NewConnection::connection`.
-Existing streams can be found in `NewConnection`. 
+New streams can be created with the methods [open_bi][open_bi], [open_uni][open_uni] in NewConnection::connection][connection].
+Existing streams can be found in [NewConnection][NewConnection]. 
 Both the client and the server are able to open a stream and send or receive data from it. 
 
 
@@ -165,5 +166,11 @@ async fn receive_datagram(mut connection: NewConnection) -> anyhow::Result<()> {
 }
 ```
 
-[unreliable]: ../network-introduction/transport-guarantees.md#unreliable
-[connection]: https://docs.rs/quinn/0.6.1/quinn/generic/struct.Connection.html
+[unreliable]: ../network-introduction/transport-guarantees.md
+
+[Endpoint]: https://docs.rs/quinn/latest/quinn/generic/struct.Endpoint.html
+[NewConnection]: https://docs.rs/quinn/latest/quinn/generic/struct.NewConnection.html
+[open_bi]: https://docs.rs/quinn/latest/quinn/generic/struct.Connection.html#method.open_bi
+[open_uni]: https://docs.rs/quinn/latest/quinn/generic/struct.Connection.html#method.open_uni
+[send_datagram]: https://docs.rs/quinn/latest/quinn/generic/struct.Connection.html#method.send_datagram
+[connection]: https://docs.rs/quinn/latest/quinn/generic/struct.NewConnection.html#structfield.connection

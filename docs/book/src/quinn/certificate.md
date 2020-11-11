@@ -13,8 +13,9 @@ This additional configuration will be the subject of this chapter.
 
 ## Insecure Connection
 
-A certificate is not practical for cases such as: peer-to-peer, trust-on-first-use, deliberately insecure applications, or when the servers are not identified by the domain name. Custom certificate validation logic can be implemented when the `dangerous_configuration` function of [rustls][rust-ls] is enabled. 
-Once done, the certificate verifier can manually override in the `quinn::ClientConfig`.
+A certificate is not practical for cases such as: peer-to-peer, trust-on-first-use, deliberately insecure applications, or when the servers are not identified by the domain name. 
+Custom certificate validation logic can be implemented when the `dangerous_configuration` function of [rustls][rust-ls] is enabled. 
+Once done, the certificate verifier can be manually overwritten in the [ClientConfig][ClientConfig].
 
 Start with adding a [rustls][rust-ls] dependency with the `dangerous_configuration` feature flag to your toml file.
 
@@ -23,7 +24,7 @@ quinn = "*"
 rustls = { version = "*", features = ["dangerous_configuration", "quic"] }
 ``` 
 
-Then, you can skip the certificate validation on the client by implementing `rustls::ServerCertVerifier` and let it always return 'correct'.
+Then, you can skip the certificate validation on the client by implementing [ServerCertVerifier][ServerCertVerifier] and let it always return 'correct'.
 
 ```rust
 // Implementation of `ServerCertVerifier` that verifies everything as trustworthy.
@@ -42,7 +43,7 @@ impl rustls::ServerCertVerifier for SkipCertificationVerification {
 }
 ```
 
-After that, we can configure our `ClientConfig` to use this new `CertificateVerifier`. 
+After that, we can configure our [ClientConfig][ClientConfig] to use this new [ServerCertVerifier][ServerCertVerifier]. 
 
 ```rust
 pub fn insecure() -> ClientConfig {
@@ -61,7 +62,7 @@ pub fn insecure() -> ClientConfig {
 }
 ```
  
-Finally, if you throw this `ClientConfig` into the `Endpoint::default_client_config()` your endpoint should verify all connections as trustworthy.
+Finally, if you throw this [ClientConfig][ClientConfig] into the [EndpointBuilder::default_client_config()][default_client_config] your endpoint should verify all connections as trustworthy.
 
 ## Using Certificates
 
@@ -97,7 +98,7 @@ A [self-signed][self-signed] certificate is a security certificate that is unkno
 These certificates are easy to create and cost no money. 
 However, they do not offer all the security features that certificates from a CA do have. 
 You can create a self-signed certificate using [rcgen][rcgen] and write it to a permanent place. 
-Note that `generate_simple_self_signed` supports both `.der` and `.pem` formatting.
+Note that [generate_simple_self_signed][generate_simple_self_signed] returns a [Certificate][Certificate] that supports both `.der` and `.pem` formatting.
 
 Let's look at an example:
 
@@ -126,11 +127,14 @@ There is plenty of good documentation out there that can help you further.
 **Generate Certificate**
 
 Let's Encrypt works with [Certbot][certbot], certbort generates the certificate for you.
-Often a certificate is generated to secure a web server. Because we generate a certificate for a protocol, the configuration process will be slightly different than normal. We assume that you do not have a web server. 
+Often a certificate is generated to secure a web server. 
+Because we generate a certificate for a protocol, the configuration process will be slightly different than normal. 
+We assume that you do not have a web server. 
 Select on the certbot website that you do not have a web server and follow the given installation instructions.
 
 If certbot is installed, execute `certbot certonly --standalone`, this command will run a web server in the background during the process.
-Cerbot asks for your data, after entering it two `.pem` files are generated, namely `cert.pem` and `privkey.pem`. Copy them to your project because we will reference them in code. 
+Certbot asks for your data, after entering it two `.pem` files are generated, namely `cert.pem` and `privkey.pem`. 
+Copy them to your project because we will reference them in code. 
  
 ```rust
 // Read from certificate and key from directory. 
@@ -145,8 +149,6 @@ Now you generated, or maybe you already had, the certificate, they need to be co
 
 **Configure Server**
 
-*`certificate` is of type `Certificate` and `key` of type `PrivateKey`.*
-
 ```rust
 let mut builder = ServerConfigBuilder::default();
 builder.certificate(CertificateChain::from_certs(vec![certificate]), key)?;
@@ -156,8 +158,6 @@ This is the only thing you need to do for your sever to be secured.
 
 **Configure Client**
 
-*`certificate` is of type `Certificate`
-
 ```rust
 let mut builder = ClientConfigBuilder::default();
 builder.add_certificate_authority(certificate)?;    
@@ -165,7 +165,7 @@ builder.add_certificate_authority(certificate)?;
 
 This is the only thing you need to do for your client to be secured.
 
-[Nextup](set-up-connection.md), we will investigate how to use this setup an connection with this certificate. 
+[Nextup](set-up-connection.md), we will investigate how to setup a connection with this certificate. 
 
 [certbot]: https://certbot.eff.org/instructions
 [lets-encrypt]: https://letsencrypt.org/getting-started/
@@ -174,3 +174,9 @@ This is the only thing you need to do for your client to be secured.
 [self-signed]: https://en.wikipedia.org/wiki/Self-signed_certificate#:~:text=In%20cryptography%20and%20computer%20security,a%20CA%20aim%20to%20provide.
 [certificate]: https://en.wikipedia.org/wiki/Public_key_certificate
 [ca]: https://en.wikipedia.org/wiki/Certificate_authority
+
+[ClientConfig]: https://docs.rs/quinn/latest/quinn/generic/struct.ClientConfig.html
+[ServerCertVerifier]: https://docs.rs/rustls/latest/rustls/trait.ServerCertVerifier.html
+[default_client_config]: https://docs.rs/quinn/latest/quinn/generic/struct.EndpointBuilder.html#method.default_client_config
+[generate_simple_self_signed]: https://docs.rs/rcgen/latest/rcgen/fn.generate_simple_self_signed.html
+[Certificate]: https://docs.rs/rcgen/latest/rcgen/struct.Certificate.html

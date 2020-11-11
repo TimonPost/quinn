@@ -2,9 +2,9 @@
 
 In the [previous chapter](certificate.md) we looked at how to configure a certificate, this aspect is therefore omitted here. 
 This chapter explains how to set up a connection and prepare it for data transfer. 
-However, sending and receiving data is discussed in the [next chapter](data-transfer.md). 
+Sending and receiving data is discussed in the [next chapter](data-transfer.md). 
 
-It all starts with the `Endpoint` struct, this is the entry of the library. 
+It all starts with the [Endpoint][Endpoint] struct, this is the entry of the library. 
 
 ## Example
 
@@ -22,17 +22,17 @@ fn server_addr() -> SocketAddr {
 }
 ```   
 
-For both the server and the client we use the `EndpointBuilder`. 
-The `EndpointBuilder` has a method `EndpointBuider::bind(address)` with which you link an address to the endpoint. 
+For both the server and the client we use the [EndpointBuilder][EndpointBuilder]. 
+The [EndpointBuilder][EndpointBuilder] has a method [bind(address)][bind] with which you link an address to the endpoint. 
 This method initializes a UDP-socket that is used by quinn.
 If you need more control over the socket creation, it is also possible to initialize a quinn endpoint with an existing UDP socket. 
-For this use the method `EndpointBuider::with_socket`.
+For this use the method [with_socket][with_socket].
 
 **Client**
 
 Just like with a TCP client, you need to connect to a destination. 
-In quinn you can do this with the method `connect()`. 
-The `connect` method has an argument 'server name', this is the name that is in the certificate. 
+In quinn you can do this with the method [connect()][connect]. 
+The [connect()][connect] method has an argument 'server name', this is the name that is in the certificate. 
 
 ```rust
 async fn client() -> anyhow::Result<()> {
@@ -55,8 +55,8 @@ async fn client() -> anyhow::Result<()> {
 **Server**
 
 Just like a TCP Listener, you have to listen to incoming connections. 
-Before you can listen to connections you need to configure the `EndpointBuilder` as a server.  
-Note that the configuration itself does not perform any listening logic, this can only be done after you have run `bind()`.  
+Before you can listen to connections you need to configure the [EndpointBuilder][EndpointBuilder] as a server.  
+Note that the configuration itself does not perform any listening logic, this can only be done after you have run [bind()][bind].  
 
 ```rust
 async fn server() -> anyhow::Result<()> {
@@ -77,3 +77,9 @@ async fn server() -> anyhow::Result<()> {
     Ok(())
 }
 ```
+
+[Endpoint]: https://docs.rs/quinn/0.6.1/quinn/generic/struct.Endpoint.html
+[EndpointBuilder]: https://docs.rs/quinn/0.6.1/quinn/generic/struct.EndpointBuilder.html
+[bind]: https://docs.rs/quinn/0.6.1/quinn/generic/struct.EndpointBuilder.html#method.bind
+[connect]: https://docs.rs/quinn/0.6.1/quinn/generic/struct.Endpoint.html#method.connect
+[with_socket]: https://docs.rs/quinn/0.6.1/quinn/generic/struct.EndpointBuilder.html#method.with_socket

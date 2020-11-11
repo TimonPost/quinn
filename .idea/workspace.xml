@@ -48,15 +48,6 @@
   <component name="ChangeListManager">
     <list default="true" id="ca3fcb47-bbae-45d4-b725-f93b0b257dc7" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/book/src/SUMMARY.md" beforeDir="false" afterPath="$PROJECT_DIR$/docs/book/src/SUMMARY.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/book/src/network-introduction.md" beforeDir="false" afterPath="$PROJECT_DIR$/docs/book/src/network-introduction.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/book/src/network-introduction/tcp-problems.md" beforeDir="false" afterPath="$PROJECT_DIR$/docs/book/src/network-introduction/tcp-problems.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/book/src/network-introduction/transport-guarantees.md" beforeDir="false" afterPath="$PROJECT_DIR$/docs/book/src/network-introduction/transport-guarantees.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/book/src/network-introduction/transport-protocols.md" beforeDir="false" afterPath="$PROJECT_DIR$/docs/book/src/network-introduction/transport-protocols.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/book/src/quinn.md" beforeDir="false" afterPath="$PROJECT_DIR$/docs/book/src/quinn.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/book/src/quinn/data-transfer.md" beforeDir="false" afterPath="$PROJECT_DIR$/docs/book/src/quinn/data-transfer.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/book/src/quinn/introduction.md" beforeDir="false" afterPath="$PROJECT_DIR$/docs/book/src/quinn/introduction.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/book/src/quinn/set-up-connection.md" beforeDir="false" afterPath="$PROJECT_DIR$/docs/book/src/quinn/set-up-connection.md" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -115,7 +106,7 @@
       <workItem from="1604840686251" duration="8871000" />
       <workItem from="1604937794896" duration="9838000" />
       <workItem from="1605029307438" duration="3892000" />
-      <workItem from="1605081308059" duration="6049000" />
+      <workItem from="1605081308059" duration="6254000" />
     </task>
     <servers />
   </component>
