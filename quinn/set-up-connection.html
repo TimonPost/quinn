@@ -166,8 +166,8 @@
                         <h1><a class="header" href="#connection-setup" id="connection-setup">Connection Setup</a></h1>
 <p>In the <a href="certificate.html">previous chapter</a> we looked at how to configure a certificate, this aspect is therefore omitted here. 
 This chapter explains how to set up a connection and prepare it for data transfer. 
-However, sending and receiving data is discussed in the <a href="data-transfer.html">next chapter</a>. </p>
-<p>It all starts with the <code>Endpoint</code> struct, this is the entry of the library. </p>
+Sending and receiving data is discussed in the <a href="data-transfer.html">next chapter</a>. </p>
+<p>It all starts with the <a href="https://docs.rs/quinn/latest/quinn/generic/struct.Endpoint.html">Endpoint</a> struct, this is the entry of the library. </p>
 <h2><a class="header" href="#example" id="example">Example</a></h2>
 <p>Let's start by defining some constants. </p>
 <pre><pre class="playground"><code class="language-rust">
@@ -184,15 +184,15 @@ fn server_addr() -&gt; SocketAddr {
 }
 <span class="boring">}
 </span></code></pre></pre>
-<p>For both the server and the client we use the <code>EndpointBuilder</code>. 
-The <code>EndpointBuilder</code> has a method <code>EndpointBuider::bind(address)</code> with which you link an address to the endpoint. 
+<p>For both the server and the client we use the <a href="https://docs.rs/quinn/latest/quinn/generic/struct.EndpointBuilder.html">EndpointBuilder</a>. 
+The <a href="https://docs.rs/quinn/latest/quinn/generic/struct.EndpointBuilder.html">EndpointBuilder</a> has a method <a href="https://docs.rs/quinn/latest/quinn/generic/struct.EndpointBuilder.html#method.bind">bind(address)</a> with which you link an address to the endpoint. 
 This method initializes a UDP-socket that is used by quinn.
 If you need more control over the socket creation, it is also possible to initialize a quinn endpoint with an existing UDP socket. 
-For this use the method <code>EndpointBuider::with_socket</code>.</p>
+For this use the method <a href="https://docs.rs/quinn/latest/quinn/generic/struct.EndpointBuilder.html#method.with_socket">with_socket</a>.</p>
 <p><strong>Client</strong></p>
 <p>Just like with a TCP client, you need to connect to a destination. 
-In quinn you can do this with the method <code>connect()</code>. 
-The <code>connect</code> method has an argument 'server name', this is the name that is in the certificate. </p>
+In quinn you can do this with the method <a href="https://docs.rs/quinn/latest/quinn/generic/struct.Endpoint.html#method.connect">connect()</a>. 
+The <a href="https://docs.rs/quinn/latest/quinn/generic/struct.Endpoint.html#method.connect">connect()</a> method has an argument 'server name', this is the name that is in the certificate. </p>
 <pre><pre class="playground"><code class="language-rust">
 <span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
@@ -215,8 +215,8 @@ The <code>connect</code> method has an argument 'server name', this is the name 
 </span></code></pre></pre>
 <p><strong>Server</strong></p>
 <p>Just like a TCP Listener, you have to listen to incoming connections. 
-Before you can listen to connections you need to configure the <code>EndpointBuilder</code> as a server.<br />
-Note that the configuration itself does not perform any listening logic, this can only be done after you have run <code>bind()</code>.</p>
+Before you can listen to connections you need to configure the <a href="https://docs.rs/quinn/latest/quinn/generic/struct.EndpointBuilder.html">EndpointBuilder</a> as a server.<br />
+Note that the configuration itself does not perform any listening logic, this can only be done after you have run <a href="https://docs.rs/quinn/latest/quinn/generic/struct.EndpointBuilder.html#method.bind">bind()</a>.</p>
 <pre><pre class="playground"><code class="language-rust">
 <span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
