@@ -12,33 +12,25 @@ The protocol is [reliable ordered][guarantees] in nature.
 instead of adding lots of features and complexity, UDP is a very thin layer over IP and is also [unreliable][guarantees] in nature.
 
 | Feature |  TCP  | UDP |
-| :-------------: | :-------------: | :-------------:    |
-|  [Connection-Oriented][connection-oriented]  |       Yes                              |      No                       |
-|  [Transport Guarantees][transport-guarantees] | [Reliable Ordered][guarantees]   |      [Unreliable][guarantees] |
-|  Packet Transfer                             | [Stream-based][stream-based]           |      Message based            |
-|  Automatic [fragmentation][ip-fragmentation] | Yes                                    |      Yes, but better is to stay below datagram size limit |
-|  Header Size                                 |  20 bytes                              |      8 bytes                  |
-|  [Control Flow, Congestion Avoidance/Control][congestion-control] | Yes               |      No                       |                                            
-
-[internet-protocol-suite]: https://en.wikipedia.org/wiki/Internet_protocol_suite
-[stream-based]: https://en.wikipedia.org/wiki/Stream_(computing)
-[congestion-control]: https://en.wikipedia.org/wiki/TCP_congestion_control
-[connection-oriented]: https://en.wikipedia.org/wiki/Connection-oriented_communication
-[ip-fragmentation]: https://en.wikipedia.org/wiki/IP_fragmentation
-[guarantees]: ./#the-5-transport-guarantees
-[transport-guarantees]: #/transport-guarantees
+| :-------------: | :-------------: | :-------------: |
+|  [Connection-Oriented][6]           |       Yes                      | No                       |
+|  [Transport Guarantees][guarantees] | [Reliable Ordered][guarantees] | [Unreliable][guarantees] |
+|  Packet Transfer                    | [Stream-based][4]              | Message based            |
+|  Automatic [fragmentation][8]       | Yes                            | Yes, but better is to stay below datagram size limit |
+|  Header Size                        |  20 bytes                      | 8 bytes                  |
+|  [Control Flow, Congestion Avoidance/Control][5] | Yes               | No                       |                                            
 
 ## 2. The 5 Transport Guarantees
 
 There are 5 main different ways you can transfer data:
 
 | Transport Guarantees         | Packet Drop [(1)][1]  | Packet Duplication [(2)][2] | Packet Order | Packet Delivery |
-| :-------------:              | :-------------: | :-------------:    | :-------------:  |  :-------------:
-|   **Unreliable Unordered**   |       Any       |      Yes           |     No           |    No
-|   **Unreliable Sequenced**   |    Any + old    |      No            |     Sequenced    |    No
-|   **Reliable Unordered**     |       No        |      No            |     No           |    Yes
-|   **Reliable Ordered**       |       No        |      No            |     Ordered      |    Yes
-|   **Reliable Sequenced**     |    Only old     |      No            |     Sequenced    |    Only newest
+| :-------------:              | :-------------: | :-------------: | :-------------: | :-------------:
+|   **Unreliable Unordered**   |       Any       |      Yes        |     No          |   No
+|   **Unreliable Sequenced**   |    Any + old    |      No         |     Sequenced   |   No
+|   **Reliable Unordered**     |       No        |      No         |     No          |   Yes
+|   **Reliable Ordered**       |       No        |      No         |     Ordered     |   Yes
+|   **Reliable Sequenced**     |    Only old     |      No         |     Sequenced   |   Only newest
 
 Unreliability gives great uncertainty with a lot of freedom, while reliability gives great certainty with costs in speed and freedom.
 That is why protocols such as QUIC, RUDP, SCTP, QUIC, netcode, laminar are build on UDP instead of TCP. 
@@ -49,10 +41,6 @@ but I think we should start looking at what protocol has what purposes.
 The key is that a combination of these guarantees are needed for different use cases. 
 It is therefore important that you check for your scenario which one you need. 
 
-[1]: https://en.wikipedia.org/wiki/Packet_loss
-[2]: https://observersupport.viavisolutions.com/html_doc/current/index.html#page/gigastor_hw/packet_deduplicating.html
-[3]: https://nl.wikipedia.org/wiki/Internetprotocol
-
 ## 3. Issues with TCP 
 
 Now the golden question: "Why choose so much uncertainty with UDP when TCP is so reliable and safe?". 
@@ -61,7 +49,7 @@ To answer that question we will have to delve a little deeper into some issues w
 ## Head-of-line Blocking
 
 One of the biggest problem/feature in the TCP protocol is the Head-of-line blocking. 
-It is a convenient feature because it ensures that all packages are sent and arrive in [order][order]. 
+It is a convenient feature because it ensures that all packages are sent and arrive in [order][guarantees]. 
 However, in cases of high throughput (multiplayer game networking) and big load in short time (web page load) this can be catastrophic to your application performance.
 
 Lets check this animation to demonstrate the issue:
@@ -97,7 +85,7 @@ We will take a deeper dive into this subject when looking at QUIC multiplexing.
 
 In standard HTTP+TLS+TCP stack, TCP needs a handshake to establish a session between server and client, and TLS needs its own handshake to ensure that the session is secured.
 
-![TCP-handshake](../images/tcp-handshake.svg.png)
+![TCP-handshake](./images/tcp-handshake.svg.png)
 
 First, the source sends an 'SYN initial request' packet to the target server in order to start the dialogue. 
 Then the target server sends a 'SYN-ACK packet' to agree to the process.
@@ -124,13 +112,15 @@ This decreases the performance of HTTP/1.1 significantly when loading embedded f
 wait for a request from the client, even if the server knows
 that the client needs a specific resource.
 
-[order]: transport-guarantees.md#ordering-vs-sequencing
-[reliable-ordered]: transport-guarantees.md#reliable-ordered
-[internet-protocol-suite]: https://en.wikipedia.org/wiki/Internet_protocol_suite
-[animation]: ../images/hol.gif
-[website-trend]: ../images/website-size-trend.png
 
-1. [Transport Guarantees](network-introduction/transport-guarantees.md) (what guarantees for transmission exists)
-2. [Transport Protocols](network-introduction/transport-protocols.md) (analyse of UDP and TCP internals)
-3. [TCP Problems](network-introduction/tcp-problems.md) (description of TCP its problems)
- 
+[guarantees]: #2-the-5-transport-guarantees
+[animation]: ./images/hol.gif 
+
+[1]: https://en.wikipedia.org/wiki/Packet_loss
+[2]: https://observersupport.viavisolutions.com/html_doc/current/index.html#page/gigastor_hw/packet_deduplicating.html
+[3]: https://nl.wikipedia.org/wiki/Internetprotocol
+[4]: https://en.wikipedia.org/wiki/Stream_(computing)
+[5]: https://en.wikipedia.org/wiki/TCP_congestion_control
+[6]: https://en.wikipedia.org/wiki/Connection-oriented_communication
+[7]: https://en.wikipedia.org/wiki/Internet_protocol_suite
+[8]: https://en.wikipedia.org/wiki/IP_fragmentation
