@@ -186,9 +186,9 @@ Two stream-based and one message-based.</p>
 <p>Soon we will discuss this in more detail.</p>
 <h2><a class="header" href="#how-to-use" id="how-to-use">How to Use</a></h2>
 <p>You can open a new stream or read from an existing stream of data.
-New streams can be created with the methods <a href="https://docs.rs/quinn/latest/quinn/generic/struct.Connection.html#method.open_bi">open_bi</a>, <a href="https://docs.rs/quinn/latest/quinn/generic/struct.Connection.html#method.open_uni">open_uni</a> in NewConnection::connection]<a href="https://docs.rs/quinn/latest/quinn/generic/struct.NewConnection.html#structfield.connection">connection</a>.
-Existing streams can be found in <a href="https://docs.rs/quinn/latest/quinn/generic/struct.NewConnection.html">NewConnection</a>. 
-Both the client and the server are able to open a stream and send or receive data from it. </p>
+New streams can be created with the methods <a href="https://docs.rs/quinn/latest/quinn/generic/struct.Connection.html#method.open_bi">open_bi</a>, <a href="https://docs.rs/quinn/latest/quinn/generic/struct.Connection.html#method.open_uni">open_uni</a> from <a href="https://docs.rs/quinn/latest/quinn/generic/struct.NewConnection.html#structfield.connection">Connection</a> type.
+An instance of this type is found in the <a href="https://docs.rs/quinn/latest/quinn/generic/struct.NewConnection.html#structfield.connection">connection</a> field of <a href="https://docs.rs/quinn/latest/quinn/generic/struct.NewConnection.html">NewConnection</a>. 
+This <a href="https://docs.rs/quinn/latest/quinn/generic/struct.NewConnection.html">NewConnection</a> stores existing streams as well. Lets look at some examples:</p>
 <p><em>Iterate over various opened streams</em></p>
 <pre><pre class="playground"><code class="language-rust">
 <span class="boring">#![allow(unused)]
@@ -225,7 +225,7 @@ Both the client and the server are able to open a stream and send or receive dat
 <span class="boring">}
 </span></code></pre></pre>
 <h2><a class="header" href="#bidirectional-streams" id="bidirectional-streams">Bidirectional Streams</a></h2>
-<p>With bidirectional streams you can carry data in both directions, for example, client to server and server to client.</p>
+<p>With bidirectional streams you can carry data in both directions, for example, from the initiator to the peer and in reverse.</p>
 <p><em>open bidirectional stream</em></p>
 <pre><pre class="playground"><code class="language-rust">
 <span class="boring">#![allow(unused)]
