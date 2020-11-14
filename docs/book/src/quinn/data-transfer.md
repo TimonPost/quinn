@@ -6,14 +6,15 @@ Now we will continue with the subject of sending data over this connection.
 
 ## Multiplexing
 
-Though QUIC is built on UDP it is stream-based.
-A QUIC stream could be compared to a TCP stream, however you are not limited to a single stream. 
-You can open multiple streams between two peers which is also called multiplexing.
+A QUIC stream can be compared to a TCP stream, eventhough if it is based on UDP. 
+The big difference is that you are not limited to a single stream. 
+You can open multiple streams between two peers, this is also called multiplexing.
 
-Stream multiplexing can have a significant positive effect on the performance of applications if the resources assigned to streams are properly prioritized.
-Multiplexing is also used in the HTTP/2 protocol, but in QUIC it is not handled automatically.
-It is entirely in the hands of the user to deal efficiently with multiplexing.
-
+Stream multiplexing can have a significant positive effect on application performance if the resources allocated to streams are properly prioritized.
+Currently it is used in a protocol like HTTP/2, but unlike HTTP multiplexing, QUIC does not automatically multiplexing data.
+This is an advantage because the user gets full control over the multiplexing. 
+In addition, QUIC is not limited to one kind of stream but can open both bidirectional and unidirectional streams.
+ 
 ## Stream Types
 
 Quinn offers three ways to send your data. 
@@ -25,7 +26,7 @@ Two stream-based and one message-based.
 | **Unidirectional Stream** | one way stream communication. | see [open_uni][open_uni] |
 | **Unreliable Messaging** | message based unreliable communication. | see [send_datagram][send_datagram] |
 
-Soon we will discuss this in more detail with a few more people.   
+Soon we will discuss this in more detail.
 
 ## How to Use
 
