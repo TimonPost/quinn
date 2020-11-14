@@ -31,10 +31,9 @@ Soon we will discuss this in more detail.
 ## How to Use
 
 You can open a new stream or read from an existing stream of data.
-New streams can be created with the methods [open_bi][open_bi], [open_uni][open_uni] in NewConnection::connection][connection].
-Existing streams can be found in [NewConnection][NewConnection]. 
-Both the client and the server are able to open a stream and send or receive data from it. 
-
+New streams can be created with the methods [open_bi][open_bi], [open_uni][open_uni] from [Connection][Connection] type.
+An instance of this type is found in the [connection][connection] field of [NewConnection][NewConnection]. 
+This [NewConnection][NewConnection] stores existing streams as well. Lets look at some examples:
 
 *Iterate over various opened streams*
 
@@ -71,7 +70,7 @@ async fn open_streams(mut connection: Connection) -> anyhow::Result<()> {
 
 ## Bidirectional Streams
 
-With bidirectional streams you can carry data in both directions, for example, client to server and server to client.
+With bidirectional streams you can carry data in both directions, for example, from the initiator to the peer and in reverse.
  
 *open bidirectional stream*
 
@@ -168,7 +167,6 @@ async fn receive_datagram(mut connection: NewConnection) -> anyhow::Result<()> {
 ```
 
 [unreliable]: ../network-introduction/transport-guarantees.md
-
 [Endpoint]: https://docs.rs/quinn/latest/quinn/generic/struct.Endpoint.html
 [NewConnection]: https://docs.rs/quinn/latest/quinn/generic/struct.NewConnection.html
 [open_bi]: https://docs.rs/quinn/latest/quinn/generic/struct.Connection.html#method.open_bi
