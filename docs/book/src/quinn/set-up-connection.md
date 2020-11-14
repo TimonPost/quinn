@@ -1,8 +1,9 @@
 # Connection Setup
 
-In the [previous chapter](certificate.md) we looked at how to configure a certificate, this aspect is therefore omitted here. 
+In the [previous chapter](certificate.md) we looked at how to configure a certificate.
+This aspect is omitted in this chapter to prevent duplication. 
+But keep **remember** that is is required to get your [Endpoint][Endpoint] up and running. 
 This chapter explains how to set up a connection and prepare it for data transfer. 
-Sending and receiving data is discussed in the [next chapter](data-transfer.md). 
 
 It all starts with the [Endpoint][Endpoint] struct, this is the entry of the library. 
 

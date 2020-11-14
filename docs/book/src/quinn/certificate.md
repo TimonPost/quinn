@@ -1,30 +1,31 @@
 # Certificates
 
-In this chapter, we discuss the configuration of the certificates that are **required** for a working Quinn connection. 
+In this chapter, we discuss the configuration of the certificates that is **required** for a working Quinn connection. 
 
 A [Certificate Authority (CA)][ca] is an entity that issues digital [certificates][certificate]. 
 These digital certificates certify ownership of a public key associated with, for example, a host, server, client, or document.
 Digital certificates ensure that users can be confident that the content actually comes from a reliable, secure source.
 
-By default, Quinn clients validate the cryptographic identity of the servers they connect to. 
+**By default**, Quinn clients validate the cryptographic identity of the servers they connect to. 
 This prevents an attacker from intercepting messages.
 While it is great that quinn offers security by default it requires additional configuration.
 This additional configuration will be the subject of this chapter. 
 
 ## Insecure Connection
 
-A certificate is not practical for cases such as: peer-to-peer, trust-on-first-use, deliberately insecure applications, or when the servers are not identified by the domain name. 
-Custom certificate validation logic can be implemented when the `dangerous_configuration` function of [rustls][rust-ls] is enabled. 
-Once done, the certificate verifier can be manually overwritten in the [ClientConfig][ClientConfig].
+A certificate is not practical for cases such as: peer-to-peer, trust-on-first-use,
+deliberately insecure applications, or when the servers are not identified by the domain name. 
+You can change certificate validation logic when the `dangerous_configuration` feature flag of [rustls][rust-ls] is enabled.
+Then the only thing that needs to be done is to configure the client to trust any server.
 
-Start with adding a [rustls][rust-ls] dependency with the `dangerous_configuration` feature flag to your toml file.
+Start with adding a [rustls][rust-ls] dependency with the `dangerous_configuration` feature flag to your `Cargo.toml` file.
 
 ```toml
 quinn = "*"
 rustls = { version = "*", features = ["dangerous_configuration", "quic"] }
 ``` 
 
-Then, you can skip the certificate validation on the client by implementing [ServerCertVerifier][ServerCertVerifier] and let it always return 'correct'.
+Then, you can skip the certificate validation on the client by implementing [ServerCertVerifier][ServerCertVerifier] and let it assert true for any server. 
 
 ```rust
 // Implementation of `ServerCertVerifier` that verifies everything as trustworthy.
@@ -62,12 +63,12 @@ pub fn insecure() -> ClientConfig {
 }
 ```
  
-Finally, if you throw this [ClientConfig][ClientConfig] into the [EndpointBuilder::default_client_config()][default_client_config] your endpoint should verify all connections as trustworthy.
+Finally, if you plug this [ClientConfig][ClientConfig] into the [EndpointBuilder::default_client_config()][default_client_config] your client endpoint should verify all connections as trustworthy.
 
 ## Using Certificates
 
 In this section we look at certifying an endpoint with a real certificate. 
-This can be done with a real certificate, but also with a self-identified certificate. 
+This can be done with either a real certificate or a self-identified certificate.
 
 Let's define two useful functions that can dissect byte certificates and return quinn types.
 
@@ -79,7 +80,7 @@ pub fn parse_der(cert: Vec<u8>, private_key: Vec<u8>) -> anyhow::Result<(quinn::
 }
 
 pub fn parse_pem(cert: Vec<u8>, private_key: Vec<u8>) -> anyhow::Result<(quinn::Certificate, quinn::PrivateKey)> {
-    // Parse to certificate chain whereafter taking the first certificate in this chain.
+    // Parse to certificate chain whereafter taking the first certifcater in this chain.
     let cert = quinn::CertificateChain::from_pem(&cert)?.iter().next().unwrap().clone();
     let key = quinn::PrivateKey::from_pem(&private_key)?;
 
@@ -94,11 +95,11 @@ The code translation is shown above.
 
 ### Self Signed
 
-A [self-signed][self-signed] certificate is a security certificate that is unknown not by a CA but by yourself. 
+A [self-signed][self-signed] certificate entails that you sign a certificate with your own CA. 
 These certificates are easy to create and cost no money. 
 However, they do not offer all the security features that certificates from a CA do have. 
-You can create a self-signed certificate using [rcgen][rcgen] and write it to a permanent place. 
-Note that [generate_simple_self_signed][generate_simple_self_signed] returns a [Certificate][Certificate] that supports both `.der` and `.pem` formatting.
+Some ways to create a self-signed certificate is by using [rcgen][rcgen] or openssl. 
+In this example [rcgen][rcgen] is used.   
 
 Let's look at an example:
 
@@ -117,12 +118,13 @@ pub fn generate_self_signed_cert(cert_path: &str, key_path: &str) -> anyhow::Res
 }
 ```
 
+*Note that [generate_simple_self_signed][generate_simple_self_signed] returns a [Certificate][Certificate] that can be serialized to both `.der` and `.pem` formats.*
+
 ### Official Certificates
 
 [Let's Encrypt][lets-encrypt] is a CA and distributes certificates for free. 
 Its a very well-known CA used by many applications around the world.
-We can cover a full lets-encrypt tutorial here but instead I am going to keep it short. 
-There is plenty of good documentation out there that can help you further.  
+We can cover a detailed lets-encrypt tutorial but there is plenty of good documentation out there.  
 
 **Generate Certificate**
 
@@ -132,9 +134,9 @@ Because we generate a certificate for a protocol, the configuration process will
 We assume that you do not have a web server. 
 Select on the certbot website that you do not have a web server and follow the given installation instructions.
 
-If certbot is installed, execute `certbot certonly --standalone`, this command will run a web server in the background during the process.
+If certbot is installed, execute `certbot certonly --standalone`, this command will fire up a web server in the background.
 Certbot asks for your data, after entering it two `.pem` files are generated, namely `cert.pem` and `privkey.pem`. 
-Copy them to your project because we will reference them in code. 
+Next we can reference those files in the code.  
  
 ```rust
 // Read from certificate and key from directory. 
@@ -146,6 +148,8 @@ parse_pem(cert, key)
 ### Configuring Certificates
 
 Now you generated, or maybe you already had, the certificate, they need to be configured into the client and server. 
+After configuring plug the configuration into the `Endpoint`.
+
 
 **Configure Server**
 
@@ -165,7 +169,9 @@ builder.add_certificate_authority(certificate)?;
 
 This is the only thing you need to do for your client to be secured.
 
-[Nextup](set-up-connection.md), we will investigate how to setup a connection with this certificate. 
+<br><hr>
+
+[Nextup](set-up-connection.md), lets look at how to setup a connection. 
 
 [certbot]: https://certbot.eff.org/instructions
 [lets-encrypt]: https://letsencrypt.org/getting-started/
