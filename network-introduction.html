@@ -190,15 +190,11 @@ instead of adding lots of features and complexity, UDP is a very thin layer over
 </tbody></table>
 <p>Unreliability gives great uncertainty with a lot of freedom, while reliability gives great certainty with costs in speed and freedom.
 That is why protocols such as QUIC, RUDP, SCTP, QUIC, netcode, laminar are build on UDP instead of TCP. 
-UDP gives the end user more control over the transmission then TCP is able to do. More on this later.</p>
-<p>Sometimes you hear fierce discussions about why one protocol is better than the other, 
-but I think we should start looking at what protocol has what purposes.
-The key is that a combination of these guarantees are needed for different use cases. 
-It is therefore important that you check for your scenario which one you need. </p>
+UDP gives the end user more control over the transmission then TCP is able to do. </p>
 <h2><a class="header" href="#3-issues-with-tcp" id="3-issues-with-tcp">3. Issues with TCP</a></h2>
 <p>Now the golden question: &quot;Why choose so much uncertainty with UDP when TCP is so reliable and safe?&quot;. 
 To answer that question we will have to delve a little deeper into some issues with TCP. </p>
-<h2><a class="header" href="#head-of-line-blocking" id="head-of-line-blocking">Head-of-line Blocking</a></h2>
+<h3><a class="header" href="#head-of-line-blocking" id="head-of-line-blocking">Head-of-line Blocking</a></h3>
 <p>One of the biggest problem/feature in the TCP protocol is the Head-of-line blocking. 
 It is a convenient feature because it ensures that all packages are sent and arrive in <a href="#2-the-5-transport-guarantees">order</a>. 
 However, in cases of high throughput (multiplayer game networking) and big load in short time (web page load) this can be catastrophic to your application performance.</p>
@@ -221,7 +217,7 @@ As websites get bigger and attention decreases, we need faster loading times for
 In short, this means that multiple TCP streams will be setup to communicate with the server if a website loads. 
 Then If one of them blocks the whole website can continue to load seemingly while that single stream is retransmitting.</p>
 <p>We will take a deeper dive into this subject when looking at QUIC multiplexing.</p>
-<h2><a class="header" href="#connection-setup-duration" id="connection-setup-duration">Connection Setup Duration</a></h2>
+<h3><a class="header" href="#connection-setup-duration" id="connection-setup-duration">Connection Setup Duration</a></h3>
 <p>In standard HTTP+TLS+TCP stack, TCP needs a handshake to establish a session between server and client, and TLS needs its own handshake to ensure that the session is secured.</p>
 <p><img src="./images/tcp-handshake.svg.png" alt="TCP-handshake" /></p>
 <p>First, the source sends an 'SYN initial request' packet to the target server in order to start the dialogue. 
@@ -233,11 +229,11 @@ If we use an older TLS version &lt; 1.3 then there are three more handshake mess
 In a scenario of TCP and TLS 1.2 with a 100ms latency we need to wait 6 x 100ms = 600ms to set up a connection. 
 If the website is big in size, an additional load time can make the website load over a second. 
 This, of course, is disturbing for our short attention spans. </p>
-<h2><a class="header" href="#requests-in-segment" id="requests-in-segment">Requests in Segment</a></h2>
+<h3><a class="header" href="#requests-in-segment" id="requests-in-segment">Requests in Segment</a></h3>
 <p>A TCP segment can only carry a single HTTP/1.1 Request/Response. 
 Consequently it is possible that a large number of small segments are sent within
 an HTTP/1.1 session which can lead to overhead.</p>
-<h2><a class="header" href="#client-connection-initiation" id="client-connection-initiation">Client Connection Initiation</a></h2>
+<h3><a class="header" href="#client-connection-initiation" id="client-connection-initiation">Client Connection Initiation</a></h3>
 <p>HTTP/1.1 transfers are always initiated by the client. 
 This decreases the performance of HTTP/1.1 significantly when loading embedded files, because a server has to
 wait for a request from the client, even if the server knows
