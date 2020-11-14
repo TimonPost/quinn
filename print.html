@@ -97,7 +97,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded "><a href="network-introduction.html"><strong aria-hidden="true">1.</strong> Network Introduction</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="network-introduction/transport-guarantees.html"><strong aria-hidden="true">1.1.</strong> Transport Guarantees</a></li><li class="chapter-item expanded "><a href="network-introduction/transport-protocols.html"><strong aria-hidden="true">1.2.</strong> Transport Protocols</a></li><li class="chapter-item expanded "><a href="network-introduction/tcp-problems.html"><strong aria-hidden="true">1.3.</strong> Problems of TCP</a></li></ol></li><li class="chapter-item expanded "><a href="quinn.html"><strong aria-hidden="true">2.</strong> QUINN Introduction</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="quinn/introduction.html"><strong aria-hidden="true">2.1.</strong> Overview</a></li><li class="chapter-item expanded "><a href="quinn/certificate.html"><strong aria-hidden="true">2.2.</strong> Cryptography Setup</a></li><li class="chapter-item expanded "><a href="quinn/set-up-connection.html"><strong aria-hidden="true">2.3.</strong> Connection Setup</a></li><li class="chapter-item expanded "><a href="quinn/data-transfer.html"><strong aria-hidden="true">2.4.</strong> Data Transfer</a></li></ol></li><li class="chapter-item expanded "><a href="quic.html"><strong aria-hidden="true">3.</strong> QUICK Introduction</a></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded "><a href="network-introduction.html"><strong aria-hidden="true">1.</strong> Network Introduction</a></li><li class="chapter-item expanded "><a href="quinn.html"><strong aria-hidden="true">2.</strong> QUINN Introduction</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="quinn/introduction.html"><strong aria-hidden="true">2.1.</strong> Overview</a></li><li class="chapter-item expanded "><a href="quinn/certificate.html"><strong aria-hidden="true">2.2.</strong> Cryptography Setup</a></li><li class="chapter-item expanded "><a href="quinn/set-up-connection.html"><strong aria-hidden="true">2.3.</strong> Connection Setup</a></li><li class="chapter-item expanded "><a href="quinn/data-transfer.html"><strong aria-hidden="true">2.4.</strong> Data Transfer</a></li></ol></li><li class="chapter-item expanded "><a href="quic.html"><strong aria-hidden="true">3.</strong> QUICK Introduction</a></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -166,40 +166,24 @@
                 <div id="content" class="content">
                     <main>
                         <h1><a class="header" href="#networking-introduction" id="networking-introduction">Networking Introduction</a></h1>
-<p>The Internet is unreliable, it changes every second, cables can be cut, network congestion can occur, packets can become corrupted, etc. 
-As soon as we send a packet, it can take any road to reach its destination. 
-To assure the end-user of certain transmission guarantees, such as the arrival of packets, specific protocols are defined.</p>
-<p>Some of those established protocols are TCP and UDP which are supported by all routers, firewalls, servers, and operating systems. 
-However, this does not mean that they are perfect or flawless.
-One of the reasons to build QUIC is to solve those problems.</p>
-<p>Before jumping directly into the meat of QUIC, it can be useful to understand its underlying motivations. 
-For those motivations, we have to inspect the flaws of TCP and the nature of UDP, 
-because QUIC tries to improve the flaws of TCP on top of UDP.</p>
-<ol>
-<li><a href="network-introduction/transport-guarantees.html">Transport Guarantees</a> (what guarantees for transmission exists)</li>
-<li><a href="network-introduction/transport-protocols.html">Transport Protocols</a> (analyse of UDP and TCP internals)</li>
-<li><a href="network-introduction/tcp-problems.html">TCP Problems</a> (description of TCP its problems)</li>
-</ol>
-<h1><a class="header" href="#transport-guarantees" id="transport-guarantees">Transport Guarantees</a></h1>
-<p>Let's start by defining terminology that is often used when it comes to protocols. 
-There are 'transport guarantees' such as the order at which packets arrive, 
-and regulation of packet corruption, duplication, and dropping. </p>
-<h2><a class="header" href="#ordering-vs-sequencing" id="ordering-vs-sequencing">Ordering VS Sequencing</a></h2>
-<p>Packet arrival is possible in two ways. 
-They can arrive in sequence and in order. </p>
-<p>Let's define two concepts here:</p>
-<ul>
-<li>&quot;Sequencing: this is the process of only caring about the newest items.&quot;_ <a href="https://dictionary.cambridge.org/dictionary/english/sequencing">1</a></li>
-<li>&quot;Ordering: this is the process of putting something in a particular order.&quot;_ <a href="https://dictionary.cambridge.org/dictionary/english/ordering">2</a></li>
-</ul>
-<p><strong>Example</strong></p>
-<ul>
-<li>Sequencing: Only the newest items will be passed trough e.g. <code>1,3,2,5,4</code> which results in <code>1,3,5</code>.</li>
-<li>Ordering: All items are returned in order <code>1,3,2,5,4</code> which results in <code>1,2,3,4,5</code>.</li>
-</ul>
-<h2><a class="header" href="#the-5-transport-guarantees" id="the-5-transport-guarantees">The 5 Transport Guarantees</a></h2>
+<p>In this chapter you will find a very short introduction to various networking concepts. </p>
+<h2><a class="header" href="#1-tcpip-and-udp-comparison" id="1-tcpip-and-udp-comparison">1. TCP/IP and UDP Comparison</a></h2>
+<p><strong>TCP:</strong> stands for 'transmission control protocol' and adds certain guarantees ontop of <a href="https://nl.wikipedia.org/wiki/Internetprotocol">IP</a>. 
+It forms the backbone for almost everything you do online, from web browsing to IRC to email to file transfer.
+The protocol is <a href="./#the-5-transport-guarantees">reliable ordered</a> in nature.</p>
+<p><strong>UDP</strong> stands for 'user datagram protocol' and adds certain guarantees ontop of <a href="https://nl.wikipedia.org/wiki/Internetprotocol">IP</a>, but unlike TCP, 
+instead of adding lots of features and complexity, UDP is a very thin layer over IP and is also <a href="./#the-5-transport-guarantees">unreliable</a> in nature.</p>
+<table><thead><tr><th align="center">Feature</th><th align="center">TCP</th><th align="center">UDP</th></tr></thead><tbody>
+<tr><td align="center"><a href="https://en.wikipedia.org/wiki/Connection-oriented_communication">Connection-Oriented</a></td><td align="center">Yes</td><td align="center">No</td></tr>
+<tr><td align="center"><a href="network-introduction.html#/transport-guarantees">Transport Guarantees</a></td><td align="center"><a href="./#the-5-transport-guarantees">Reliable Ordered</a></td><td align="center"><a href="./#the-5-transport-guarantees">Unreliable</a></td></tr>
+<tr><td align="center">Packet Transfer</td><td align="center"><a href="https://en.wikipedia.org/wiki/Stream_(computing)">Stream-based</a></td><td align="center">Message based</td></tr>
+<tr><td align="center">Automatic <a href="https://en.wikipedia.org/wiki/IP_fragmentation">fragmentation</a></td><td align="center">Yes</td><td align="center">Yes, but better is to stay below datagram size limit</td></tr>
+<tr><td align="center">Header Size</td><td align="center">20 bytes</td><td align="center">8 bytes</td></tr>
+<tr><td align="center"><a href="https://en.wikipedia.org/wiki/TCP_congestion_control">Control Flow, Congestion Avoidance/Control</a></td><td align="center">Yes</td><td align="center">No</td></tr>
+</tbody></table>
+<h2><a class="header" href="#2-the-5-transport-guarantees" id="2-the-5-transport-guarantees">2. The 5 Transport Guarantees</a></h2>
 <p>There are 5 main different ways you can transfer data:</p>
-<table><thead><tr><th align="center">Transport Guarantees</th><th align="center">Packet Drop <a href="https://en.wikipedia.org/wiki/Packet_loss">(1)</a></th><th align="center">Packet Duplication <a href="https://observersupport.viavisolutions.com/html_doc/current/index.html#page/gigastor_hw/packet_deduplicating.html">(2)</a></th><th align="center">Packet Order <a href="network-introduction/transport-guarantees.html#ordering-vs-sequencing">(3)</a></th><th align="center">Packet Delivery</th></tr></thead><tbody>
+<table><thead><tr><th align="center">Transport Guarantees</th><th align="center">Packet Drop <a href="https://en.wikipedia.org/wiki/Packet_loss">(1)</a></th><th align="center">Packet Duplication <a href="https://observersupport.viavisolutions.com/html_doc/current/index.html#page/gigastor_hw/packet_deduplicating.html">(2)</a></th><th align="center">Packet Order</th><th align="center">Packet Delivery</th></tr></thead><tbody>
 <tr><td align="center"><strong>Unreliable Unordered</strong></td><td align="center">Any</td><td align="center">Yes</td><td align="center">No</td><td align="center">No</td></tr>
 <tr><td align="center"><strong>Unreliable Sequenced</strong></td><td align="center">Any + old</td><td align="center">No</td><td align="center">Sequenced</td><td align="center">No</td></tr>
 <tr><td align="center"><strong>Reliable Unordered</strong></td><td align="center">No</td><td align="center">No</td><td align="center">No</td><td align="center">Yes</td></tr>
@@ -208,61 +192,20 @@ They can arrive in sequence and in order. </p>
 </tbody></table>
 <p>Unreliability gives great uncertainty with a lot of freedom, while reliability gives great certainty with costs in speed and freedom.
 That is why protocols such as QUIC, RUDP, SCTP, QUIC, netcode, laminar are build on UDP instead of TCP. 
-UDP gives the end user more control over the transmission then TCP is able to do. More on this <a href="network-introduction/transport-protocols.html">later</a>.</p>
+UDP gives the end user more control over the transmission then TCP is able to do. More on this later.</p>
 <p>Sometimes you hear fierce discussions about why one protocol is better than the other, 
 but I think we should start looking at what protocol has what purposes.
 The key is that a combination of these guarantees are needed for different use cases. 
 It is therefore important that you check for your scenario which one you need. </p>
-<p><br><hr></p>
-<p><a href="network-introduction/transport-protocols.html">Nextup</a>, we will apply this concept of transport guarantees to TCP and UDP.</p>
-<h1><a class="header" href="#transport-protocols" id="transport-protocols">Transport Protocols</a></h1>
-<p>In the previous chapter we looked at transport guarantees, 
-in this chapter we will apply it to UDP and TCP and look trought that light on their differences. </p>
-<p>For this chapter we will be using the <a href="https://en.wikipedia.org/wiki/Internet_protocol_suite">Internet protocol suite</a> as a guidance. </p>
-<p><img src="network-introduction/../images/osi-model.png" alt="OSI model" /></p>
-<h2><a class="header" href="#ip---internet-layer" id="ip---internet-layer">IP - Internet Layer</a></h2>
-<p>All communication over the internet is happening ontop of IP (Internet Protocol). 
-The internet protocol works by splitting data into little chunks called datagrams or packets. 
-The chunks are then sent across the internet from one IP address to another.
-However, this protocol transfers packets across the network without any guarantee and it is by nature <a href="network-introduction/transport-guarantees.html#the-5-transport-guarantees">unreliable</a>.
-Therefore we need certain <a href="network-introduction/transport-guarantees.html#the-5-transport-guarantees">specific guarantees</a>. 
-This is exactly were transport protocols, like TCP, UPD come in. </p>
-<h2><a class="header" href="#difference-application-and-transport-layer" id="difference-application-and-transport-layer">Difference Application and Transport Layer</a></h2>
-<p>Different layers serve different use cases. 
-For example, the application layer is not responsible for the data transfer while the transport layer is. 
-Both TCP and UDP work on the transport layer while a protocol like QUIC works on the application layer.<br />
-This means that QUIC defines 'application' logic on top of UDP and that UDP is responsible for the 'transport' of data. </p>
-<p>The advantage of an application protocol is that adoption and development can go faster. 
-The reason for this is that hardware devices do not need updates, 
-because routers, firewalls, and servers see QUIC packages as UDP packages.</p>
-<h2><a class="header" href="#tcpip-and-udp-comparison---transport-layer" id="tcpip-and-udp-comparison---transport-layer">TCP/IP and UDP Comparison - Transport layer</a></h2>
-<p><strong>TCP:</strong> stands for 'transmission control protocol' and adds certain guarantees ontop of <a href="network-introduction/transport-protocols.html#ip">IP</a>. 
-It forms the backbone for almost everything you do online, from web browsing to IRC to email to file transfer.
-The protocol is <a href="network-introduction/transport-guarantees.html#the-5-transport-guarantees">reliable ordered</a> in nature.</p>
-<p><strong>UDP</strong> stands for 'user datagram protocol'  and adds certain guarantees ontop of <a href="network-introduction/transport-protocols.html#ip">IP</a>, but unlike TCP, 
-instead of adding lots of features and complexity, UDP is a very thin layer over IP and is also <a href="network-introduction/transport-guarantees.html#the-5-transport-guarantees">unreliable</a> in nature.</p>
-<table><thead><tr><th align="center">Feature</th><th align="center">TCP</th><th align="center">UDP</th></tr></thead><tbody>
-<tr><td align="center"><a href="https://en.wikipedia.org/wiki/Connection-oriented_communication">Connection-Oriented</a></td><td align="center">Yes</td><td align="center">No</td></tr>
-<tr><td align="center"><a href="network-introduction/transport-guarantees.html">Transport Guarantees</a></td><td align="center"><a href="network-introduction/transport-guarantees.html#the-5-transport-guarantees">Reliable Ordered</a></td><td align="center"><a href="network-introduction/transport-guarantees.html#the-5-transport-guarantees">Unreliable</a></td></tr>
-<tr><td align="center">Packet Transfer</td><td align="center"><a href="https://en.wikipedia.org/wiki/Stream_(computing)">Stream-based</a></td><td align="center">Message based</td></tr>
-<tr><td align="center">Automatic <a href="https://en.wikipedia.org/wiki/IP_fragmentation">fragmentation</a></td><td align="center">Yes</td><td align="center">Yes, but better is to stay below datagram size limit</td></tr>
-<tr><td align="center">Header Size</td><td align="center">20 bytes</td><td align="center">8 bytes</td></tr>
-<tr><td align="center"><a href="https://en.wikipedia.org/wiki/TCP_congestion_control">Control Flow, Congestion Avoidance/Control</a></td><td align="center">Yes</td><td align="center">No</td></tr>
-</tbody></table>
-<p><br><hr></p>
-<p>Now we know the differences between UDP and TCP more clearl we can go and at take a go at the <a href="network-introduction/tcp-problems.html">flaws of TCP</a>. </p>
-<h1><a class="header" href="#problems-of-tcp" id="problems-of-tcp">Problems of TCP</a></h1>
-<p>In <a href="network-introduction/transport-protocols.html">the previous section</a> we compared TCP with UDP, now the golden question: 
-Why should we prefer one over the other? 
-One might ask: &quot;Why choose so much uncertainty with UDP when TCP is so reliable and safe?&quot;. 
-That's a good question to ask yourself. 
-To answer that question we will have to delve a little deeper into how TCP works. </p>
+<h2><a class="header" href="#3-issues-with-tcp" id="3-issues-with-tcp">3. Issues with TCP</a></h2>
+<p>Now the golden question: &quot;Why choose so much uncertainty with UDP when TCP is so reliable and safe?&quot;. 
+To answer that question we will have to delve a little deeper into some issues with TCP. </p>
 <h2><a class="header" href="#head-of-line-blocking" id="head-of-line-blocking">Head-of-line Blocking</a></h2>
 <p>One of the biggest problem/feature in the TCP protocol is the Head-of-line blocking. 
-It is a convenient feature because it ensures that all packages are sent and arrive in <a href="network-introduction/transport-guarantees.html#ordering-vs-sequencing">order</a>. 
+It is a convenient feature because it ensures that all packages are sent and arrive in <a href="transport-guarantees.html#ordering-vs-sequencing">order</a>. 
 However, in cases of high throughput (multiplayer game networking) and big load in short time (web page load) this can be catastrophic to your application performance.</p>
 <p>Lets check this animation to demonstrate the issue:</p>
-<p><img src="network-introduction/../images/hol.gif" alt="Head of line blocking" /> </p>
+<p><img src="../images/hol.gif" alt="Head of line blocking" /> </p>
 <p>This animation shows that if a certain packet drops in transmission, all packets have to wait at the transport layer until it is resent by the other end.
 If the dropped packet is resent and arrived then all packets are freed from the transport layer. </p>
 <p>Lets look at two areas were this head-of-line blocking issue is a huge deal.</p>
@@ -282,7 +225,7 @@ Then If one of them blocks the whole website can continue to load seemingly whil
 <p>We will take a deeper dive into this subject when looking at QUIC multiplexing.</p>
 <h2><a class="header" href="#connection-setup-duration" id="connection-setup-duration">Connection Setup Duration</a></h2>
 <p>In standard HTTP+TLS+TCP stack, TCP needs a handshake to establish a session between server and client, and TLS needs its own handshake to ensure that the session is secured.</p>
-<p><img src="network-introduction/../images/tcp-handshake.svg.png" alt="TCP-handshake" /></p>
+<p><img src="../images/tcp-handshake.svg.png" alt="TCP-handshake" /></p>
 <p>First, the source sends an 'SYN initial request' packet to the target server in order to start the dialogue. 
 Then the target server sends a 'SYN-ACK packet' to agree to the process.
 Lastly, the source sends an 'ACK packet' to the target to confirm the process, after which the message exchange can start. </p>
@@ -301,6 +244,11 @@ an HTTP/1.1 session which can lead to overhead.</p>
 This decreases the performance of HTTP/1.1 significantly when loading embedded files, because a server has to
 wait for a request from the client, even if the server knows
 that the client needs a specific resource.</p>
+<ol>
+<li><a href="network-introduction/transport-guarantees.html">Transport Guarantees</a> (what guarantees for transmission exists)</li>
+<li><a href="network-introduction/transport-protocols.html">Transport Protocols</a> (analyse of UDP and TCP internals)</li>
+<li><a href="network-introduction/tcp-problems.html">TCP Problems</a> (description of TCP its problems)</li>
+</ol>
 <h1 align="center"><img width="500" src="./docs/thumbnail.svg" /></h1>
 <p><a href="https://docs.rs/quinn/"><img src="https://docs.rs/quinn/badge.svg" alt="Documentation" /></a>
 <a href="https://crates.io/crates/quinn"><img src="https://img.shields.io/crates/v/quinn.svg" alt="Crates.io" /></a>
