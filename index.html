@@ -168,12 +168,12 @@
 <h2><a class="header" href="#1-tcpip-and-udp-comparison" id="1-tcpip-and-udp-comparison">1. TCP/IP and UDP Comparison</a></h2>
 <p><strong>TCP:</strong> stands for 'transmission control protocol' and adds certain guarantees ontop of <a href="https://nl.wikipedia.org/wiki/Internetprotocol">IP</a>. 
 It forms the backbone for almost everything you do online, from web browsing to IRC to email to file transfer.
-The protocol is <a href="./#the-5-transport-guarantees">reliable ordered</a> in nature.</p>
+The protocol is <a href="#2-the-5-transport-guarantees">reliable ordered</a> in nature.</p>
 <p><strong>UDP</strong> stands for 'user datagram protocol' and adds certain guarantees ontop of <a href="https://nl.wikipedia.org/wiki/Internetprotocol">IP</a>, but unlike TCP, 
-instead of adding lots of features and complexity, UDP is a very thin layer over IP and is also <a href="./#the-5-transport-guarantees">unreliable</a> in nature.</p>
+instead of adding lots of features and complexity, UDP is a very thin layer over IP and is also <a href="#2-the-5-transport-guarantees">unreliable</a> in nature.</p>
 <table><thead><tr><th align="center">Feature</th><th align="center">TCP</th><th align="center">UDP</th></tr></thead><tbody>
 <tr><td align="center"><a href="https://en.wikipedia.org/wiki/Connection-oriented_communication">Connection-Oriented</a></td><td align="center">Yes</td><td align="center">No</td></tr>
-<tr><td align="center"><a href="#/transport-guarantees">Transport Guarantees</a></td><td align="center"><a href="./#the-5-transport-guarantees">Reliable Ordered</a></td><td align="center"><a href="./#the-5-transport-guarantees">Unreliable</a></td></tr>
+<tr><td align="center"><a href="#2-the-5-transport-guarantees">Transport Guarantees</a></td><td align="center"><a href="#2-the-5-transport-guarantees">Reliable Ordered</a></td><td align="center"><a href="#2-the-5-transport-guarantees">Unreliable</a></td></tr>
 <tr><td align="center">Packet Transfer</td><td align="center"><a href="https://en.wikipedia.org/wiki/Stream_(computing)">Stream-based</a></td><td align="center">Message based</td></tr>
 <tr><td align="center">Automatic <a href="https://en.wikipedia.org/wiki/IP_fragmentation">fragmentation</a></td><td align="center">Yes</td><td align="center">Yes, but better is to stay below datagram size limit</td></tr>
 <tr><td align="center">Header Size</td><td align="center">20 bytes</td><td align="center">8 bytes</td></tr>
@@ -200,10 +200,10 @@ It is therefore important that you check for your scenario which one you need. <
 To answer that question we will have to delve a little deeper into some issues with TCP. </p>
 <h2><a class="header" href="#head-of-line-blocking" id="head-of-line-blocking">Head-of-line Blocking</a></h2>
 <p>One of the biggest problem/feature in the TCP protocol is the Head-of-line blocking. 
-It is a convenient feature because it ensures that all packages are sent and arrive in <a href="transport-guarantees.html#ordering-vs-sequencing">order</a>. 
+It is a convenient feature because it ensures that all packages are sent and arrive in <a href="#2-the-5-transport-guarantees">order</a>. 
 However, in cases of high throughput (multiplayer game networking) and big load in short time (web page load) this can be catastrophic to your application performance.</p>
 <p>Lets check this animation to demonstrate the issue:</p>
-<p><img src="../images/hol.gif" alt="Head of line blocking" /> </p>
+<p><img src="./images/hol.gif" alt="Head of line blocking" /> </p>
 <p>This animation shows that if a certain packet drops in transmission, all packets have to wait at the transport layer until it is resent by the other end.
 If the dropped packet is resent and arrived then all packets are freed from the transport layer. </p>
 <p>Lets look at two areas were this head-of-line blocking issue is a huge deal.</p>
@@ -223,7 +223,7 @@ Then If one of them blocks the whole website can continue to load seemingly whil
 <p>We will take a deeper dive into this subject when looking at QUIC multiplexing.</p>
 <h2><a class="header" href="#connection-setup-duration" id="connection-setup-duration">Connection Setup Duration</a></h2>
 <p>In standard HTTP+TLS+TCP stack, TCP needs a handshake to establish a session between server and client, and TLS needs its own handshake to ensure that the session is secured.</p>
-<p><img src="../images/tcp-handshake.svg.png" alt="TCP-handshake" /></p>
+<p><img src="./images/tcp-handshake.svg.png" alt="TCP-handshake" /></p>
 <p>First, the source sends an 'SYN initial request' packet to the target server in order to start the dialogue. 
 Then the target server sends a 'SYN-ACK packet' to agree to the process.
 Lastly, the source sends an 'ACK packet' to the target to confirm the process, after which the message exchange can start. </p>
@@ -242,11 +242,6 @@ an HTTP/1.1 session which can lead to overhead.</p>
 This decreases the performance of HTTP/1.1 significantly when loading embedded files, because a server has to
 wait for a request from the client, even if the server knows
 that the client needs a specific resource.</p>
-<ol>
-<li><a href="network-introduction/transport-guarantees.html">Transport Guarantees</a> (what guarantees for transmission exists)</li>
-<li><a href="network-introduction/transport-protocols.html">Transport Protocols</a> (analyse of UDP and TCP internals)</li>
-<li><a href="network-introduction/tcp-problems.html">TCP Problems</a> (description of TCP its problems)</li>
-</ol>
 
                     </main>
 
