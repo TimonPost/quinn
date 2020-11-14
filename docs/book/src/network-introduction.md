@@ -34,19 +34,14 @@ There are 5 main different ways you can transfer data:
 
 Unreliability gives great uncertainty with a lot of freedom, while reliability gives great certainty with costs in speed and freedom.
 That is why protocols such as QUIC, RUDP, SCTP, QUIC, netcode, laminar are build on UDP instead of TCP. 
-UDP gives the end user more control over the transmission then TCP is able to do. More on this later.
-
-Sometimes you hear fierce discussions about why one protocol is better than the other, 
-but I think we should start looking at what protocol has what purposes.
-The key is that a combination of these guarantees are needed for different use cases. 
-It is therefore important that you check for your scenario which one you need. 
+UDP gives the end user more control over the transmission then TCP is able to do. 
 
 ## 3. Issues with TCP 
 
 Now the golden question: "Why choose so much uncertainty with UDP when TCP is so reliable and safe?". 
 To answer that question we will have to delve a little deeper into some issues with TCP. 
 
-## Head-of-line Blocking
+### Head-of-line Blocking
 
 One of the biggest problem/feature in the TCP protocol is the Head-of-line blocking. 
 It is a convenient feature because it ensures that all packages are sent and arrive in [order][guarantees]. 
@@ -81,7 +76,7 @@ Then If one of them blocks the whole website can continue to load seemingly whil
 
 We will take a deeper dive into this subject when looking at QUIC multiplexing.
     
-## Connection Setup Duration
+### Connection Setup Duration
 
 In standard HTTP+TLS+TCP stack, TCP needs a handshake to establish a session between server and client, and TLS needs its own handshake to ensure that the session is secured.
 
@@ -99,13 +94,13 @@ In a scenario of TCP and TLS 1.2 with a 100ms latency we need to wait 6 x 100ms 
 If the website is big in size, an additional load time can make the website load over a second. 
 This, of course, is disturbing for our short attention spans. 
 
-## Requests in Segment
+### Requests in Segment
 
 A TCP segment can only carry a single HTTP/1.1 Request/Response. 
 Consequently it is possible that a large number of small segments are sent within
 an HTTP/1.1 session which can lead to overhead.
 
-## Client Connection Initiation
+### Client Connection Initiation
 
 HTTP/1.1 transfers are always initiated by the client. 
 This decreases the performance of HTTP/1.1 significantly when loading embedded files, because a server has to
