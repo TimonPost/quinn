@@ -11,9 +11,9 @@ The big difference is that you are not limited to a single stream.
 You can open multiple streams between two peers, this is also called multiplexing.
 
 Stream multiplexing can have a significant positive effect on application performance if the resources allocated to streams are properly prioritized.
-Currently it is used in a protocol like HTTP/2, but unlike HTTP multiplexing, QUIC does not automatically multiplexing data.
+Currently multiplexing it is used in a protocol like HTTP/2, but unlike HTTP multiplexing, QUIC does not automatically multiplex.
 This is an advantage because the user gets full control over the multiplexing. 
-In addition, QUIC is not limited to one kind of stream but can open both bidirectional and unidirectional streams.
+Another difference compared to a TCP stream is that QUIC is not limited to one kind of stream but can open both bidirectional and unidirectional streams.
  
 ## Stream Types
 
@@ -26,11 +26,9 @@ Two stream-based and one message-based.
 | **Unidirectional Stream** | one way stream communication. | see [open_uni][open_uni] |
 | **Unreliable Messaging** | message based unreliable communication. | see [send_datagram][send_datagram] |
 
-Soon we will discuss this in more detail.
-
 ## How to Use
 
-You can open a new stream or read from an existing stream of data.
+You can open a new stream or read from an existing stream.
 New streams can be created with the methods [open_bi][open_bi], [open_uni][open_uni] from [Connection][Connection] type.
 An instance of this type is found in the [connection][connection] field of [NewConnection][NewConnection]. 
 This [NewConnection][NewConnection] stores existing streams as well. Lets look at some examples:
@@ -139,7 +137,7 @@ async fn receive_unidirectional_stream(mut connection: NewConnection) -> anyhow:
 
 ## Unreliable Messaging
 
-With unreliable messaging you can transfer data [unreliable][unreliable] over bare UDP.
+With unreliable messaging you can transfer data unreliable over bare UDP.
 
 *send datagram*
 
@@ -166,7 +164,6 @@ async fn receive_datagram(mut connection: NewConnection) -> anyhow::Result<()> {
 }
 ```
 
-[unreliable]: ../network-introduction/transport-guarantees.md
 [Endpoint]: https://docs.rs/quinn/latest/quinn/generic/struct.Endpoint.html
 [NewConnection]: https://docs.rs/quinn/latest/quinn/generic/struct.NewConnection.html
 [open_bi]: https://docs.rs/quinn/latest/quinn/generic/struct.Connection.html#method.open_bi

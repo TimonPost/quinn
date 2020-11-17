@@ -2,7 +2,7 @@
 
 In the [previous chapter](certificate.md) we looked at how to configure a certificate.
 This aspect is omitted in this chapter to prevent duplication. 
-But keep **remember** that is is required to get your [Endpoint][Endpoint] up and running. 
+But **remember** that is is required to get your [Endpoint][Endpoint] up and running. 
 This chapter explains how to set up a connection and prepare it for data transfer. 
 
 It all starts with the [Endpoint][Endpoint] struct, this is the entry of the library. 
@@ -26,38 +26,13 @@ fn server_addr() -> SocketAddr {
 For both the server and the client we use the [EndpointBuilder][EndpointBuilder]. 
 The [EndpointBuilder][EndpointBuilder] has a method [bind(address)][bind] with which you link an address to the endpoint. 
 This method initializes a UDP-socket that is used by quinn.
-If you need more control over the socket creation, it is also possible to initialize a quinn endpoint with an existing UDP socket. 
-For this use the method [with_socket][with_socket].
-
-**Client**
-
-Just like with a TCP client, you need to connect to a destination. 
-In quinn you can do this with the method [connect()][connect]. 
-The [connect()][connect] method has an argument 'server name', this is the name that is in the certificate. 
-
-```rust
-async fn client() -> anyhow::Result<()> {
-    let mut endpoint_builder = Endpoint::builder();
-
-    // Bind this endpoint to a UDP socket on the given client address.
-    let (endpoint, _) = endpoint_builder.bind(&client_addr())?;
-
-    // Connect to the server passing in the server name which is supposed to be in the server certificate.
-    let connection: NewConnection = endpoint
-        .connect(&server_addr(), SERVER_NAME)?
-        .await?;
-
-    // Start transferring, receiving data, see DataTransfer tutorial.
-
-    Ok(())
-}
-```
+If you need more control over the socket creation, it is also possible to initialize a quinn endpoint with an existing UDP socket with [with_socket][with_socket]. 
 
 **Server**
 
-Just like a TCP Listener, you have to listen to incoming connections. 
-Before you can listen to connections you need to configure the [EndpointBuilder][EndpointBuilder] as a server.  
-Note that the configuration itself does not perform any listening logic, this can only be done after you have run [bind()][bind].  
+Just like a TCP Listener, you have to listen to incoming connections.
+Before you can listen to connections you need to configure the [EndpointBuilder][EndpointBuilder] as a server. 
+Note that the configuration itself does not perform any listening logic, instead use the `Incomming` type returned by [bind()][bind].  
 
 ```rust
 async fn server() -> anyhow::Result<()> {
@@ -78,6 +53,34 @@ async fn server() -> anyhow::Result<()> {
     Ok(())
 }
 ```
+
+**Client**
+
+Just like a TCP client, you need to connect to a listening endpoint (the server).
+In quinn you can do this with the method [connect()][connect].
+The [connect()][connect] method has an argument 'server name' which has to be the name that is in the configured certificate. 
+
+```rust
+async fn client() -> anyhow::Result<()> {
+    let mut endpoint_builder = Endpoint::builder();
+
+    // Bind this endpoint to a UDP socket on the given client address.
+    let (endpoint, _) = endpoint_builder.bind(&client_addr())?;
+
+    // Connect to the server passing in the server name which is supposed to be in the server certificate.
+    let connection: NewConnection = endpoint
+        .connect(&server_addr(), SERVER_NAME)?
+        .await?;
+
+    // Start transferring, receiving data, see data transfer page.
+
+    Ok(())
+}
+```
+<br><hr>
+
+[Nextup](set-up-connection.md), lets have a look at sending data over this connection.  
+
 
 [Endpoint]: https://docs.rs/quinn/latest/quinn/generic/struct.Endpoint.html
 [EndpointBuilder]: https://docs.rs/quinn/latest/quinn/generic/struct.EndpointBuilder.html

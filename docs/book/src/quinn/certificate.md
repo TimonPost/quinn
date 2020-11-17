@@ -2,7 +2,7 @@
 
 In this chapter, we discuss the configuration of the certificates that is **required** for a working Quinn connection. 
 
-A [Certificate Authority (CA)][ca] is an entity that issues digital [certificates][certificate]. 
+A [Certificate Authority (CA)][1] is an entity that issues digital [certificates][2]. 
 These digital certificates certify ownership of a public key associated with, for example, a host, server, client, or document.
 Digital certificates ensure that users can be confident that the content actually comes from a reliable, secure source.
 
@@ -15,10 +15,10 @@ This additional configuration will be the subject of this chapter.
 
 A certificate is not practical for cases such as: peer-to-peer, trust-on-first-use,
 deliberately insecure applications, or when the servers are not identified by the domain name. 
-You can change certificate validation logic when the `dangerous_configuration` feature flag of [rustls][rust-ls] is enabled.
+You can change certificate validation logic when the `dangerous_configuration` feature flag of [rustls][3] is enabled.
 Then the only thing that needs to be done is to configure the client to trust any server.
 
-Start with adding a [rustls][rust-ls] dependency with the `dangerous_configuration` feature flag to your `Cargo.toml` file.
+Start with adding a [rustls][3] dependency with the `dangerous_configuration` feature flag to your `Cargo.toml` file.
 
 ```toml
 quinn = "*"
@@ -95,11 +95,11 @@ The code translation is shown above.
 
 ### Self Signed
 
-A [self-signed][self-signed] certificate entails that you sign a certificate with your own CA. 
+A [self-signed][5] certificate entails that you sign a certificate with your own CA. 
 These certificates are easy to create and cost no money. 
 However, they do not offer all the security features that certificates from a CA do have. 
-Some ways to create a self-signed certificate is by using [rcgen][rcgen] or openssl. 
-In this example [rcgen][rcgen] is used.   
+Some ways to create a self-signed certificate is by using [rcgen][4] or openssl. 
+In this example [rcgen][4] is used.   
 
 Let's look at an example:
 
@@ -118,17 +118,17 @@ pub fn generate_self_signed_cert(cert_path: &str, key_path: &str) -> anyhow::Res
 }
 ```
 
-*Note that [generate_simple_self_signed][generate_simple_self_signed] returns a [Certificate][Certificate] that can be serialized to both `.der` and `.pem` formats.*
+*Note that [generate_simple_self_signed][generate_simple_self_signed] returns a [Certificate][2] that can be serialized to both `.der` and `.pem` formats.*
 
 ### Official Certificates
 
-[Let's Encrypt][lets-encrypt] is a CA and distributes certificates for free. 
+[Let's Encrypt][6] is a CA and distributes certificates for free. 
 Its a very well-known CA used by many applications around the world.
 We can cover a detailed lets-encrypt tutorial but there is plenty of good documentation out there.  
 
 **Generate Certificate**
 
-Let's Encrypt works with [Certbot][certbot], certbort generates the certificate for you.
+Let's Encrypt works with [Certbot][7], certbort generates the certificate for you.
 Often a certificate is generated to secure a web server. 
 Because we generate a certificate for a protocol, the configuration process will be slightly different than normal. 
 We assume that you do not have a web server. 
@@ -167,19 +167,19 @@ let mut builder = ClientConfigBuilder::default();
 builder.add_certificate_authority(certificate)?;    
 ```
 
-This is the only thing you need to do for your client to be secured.
+This is the only thing you need to do for your client trust a server certificate. 
 
 <br><hr>
 
-[Nextup](set-up-connection.md), lets look at how to setup a connection. 
+[Nextup](set-up-connection.md), lets have a look at how to setup a connection. 
 
-[certbot]: https://certbot.eff.org/instructions
-[lets-encrypt]: https://letsencrypt.org/getting-started/
-[rust-ls]: https://github.com/ctz/rustls
-[rcgen]: https://github.com/est31/rcgen
-[self-signed]: https://en.wikipedia.org/wiki/Self-signed_certificate#:~:text=In%20cryptography%20and%20computer%20security,a%20CA%20aim%20to%20provide.
-[certificate]: https://en.wikipedia.org/wiki/Public_key_certificate
-[ca]: https://en.wikipedia.org/wiki/Certificate_authority
+[1]: https://en.wikipedia.org/wiki/Certificate_authority
+[2]: https://en.wikipedia.org/wiki/Public_key_certificate
+[3]: https://github.com/ctz/rustls
+[4]: https://github.com/est31/rcgen
+[5]: https://en.wikipedia.org/wiki/Self-signed_certificate#:~:text=In%20cryptography%20and%20computer%20security,a%20CA%20aim%20to%20provide.
+[6]: https://letsencrypt.org/getting-started/
+[7]: https://certbot.eff.org/instructions
 
 [ClientConfig]: https://docs.rs/quinn/latest/quinn/generic/struct.ClientConfig.html
 [ServerCertVerifier]: https://docs.rs/rustls/latest/rustls/trait.ServerCertVerifier.html
