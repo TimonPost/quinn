@@ -95,7 +95,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded "><a href="../network-introduction.html"><strong aria-hidden="true">1.</strong> Network Introduction</a></li><li class="chapter-item expanded "><a href="../quinn.html"><strong aria-hidden="true">2.</strong> QUINN Introduction</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../quinn/introduction.html"><strong aria-hidden="true">2.1.</strong> Overview</a></li><li class="chapter-item expanded "><a href="../quinn/certificate.html"><strong aria-hidden="true">2.2.</strong> Cryptography Setup</a></li><li class="chapter-item expanded "><a href="../quinn/set-up-connection.html" class="active"><strong aria-hidden="true">2.3.</strong> Connection Setup</a></li><li class="chapter-item expanded "><a href="../quinn/data-transfer.html"><strong aria-hidden="true">2.4.</strong> Data Transfer</a></li></ol></li><li class="chapter-item expanded "><a href="../quic.html"><strong aria-hidden="true">3.</strong> QUICK Introduction</a></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded "><a href="../network-introduction.html"><strong aria-hidden="true">1.</strong> Network Introduction</a></li><li class="chapter-item expanded "><a href="../quinn.html"><strong aria-hidden="true">2.</strong> QUINN Introduction</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../quinn/introduction.html"><strong aria-hidden="true">2.1.</strong> Overview</a></li><li class="chapter-item expanded "><a href="../quinn/certificate.html"><strong aria-hidden="true">2.2.</strong> Certificate Configuration</a></li><li class="chapter-item expanded "><a href="../quinn/set-up-connection.html" class="active"><strong aria-hidden="true">2.3.</strong> Connection Setup</a></li><li class="chapter-item expanded "><a href="../quinn/data-transfer.html"><strong aria-hidden="true">2.4.</strong> Data Transfer</a></li></ol></li><li class="chapter-item expanded "><a href="../quic.html"><strong aria-hidden="true">3.</strong> QUICK Introduction</a></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -166,7 +166,7 @@
                         <h1><a class="header" href="#connection-setup" id="connection-setup">Connection Setup</a></h1>
 <p>In the <a href="certificate.html">previous chapter</a> we looked at how to configure a certificate.
 This aspect is omitted in this chapter to prevent duplication. 
-But keep <strong>remember</strong> that is is required to get your <a href="https://docs.rs/quinn/latest/quinn/generic/struct.Endpoint.html">Endpoint</a> up and running. 
+But <strong>remember</strong> that is is required to get your <a href="https://docs.rs/quinn/latest/quinn/generic/struct.Endpoint.html">Endpoint</a> up and running. 
 This chapter explains how to set up a connection and prepare it for data transfer. </p>
 <p>It all starts with the <a href="https://docs.rs/quinn/latest/quinn/generic/struct.Endpoint.html">Endpoint</a> struct, this is the entry of the library. </p>
 <h2><a class="header" href="#example" id="example">Example</a></h2>
@@ -188,36 +188,11 @@ fn server_addr() -&gt; SocketAddr {
 <p>For both the server and the client we use the <a href="https://docs.rs/quinn/latest/quinn/generic/struct.EndpointBuilder.html">EndpointBuilder</a>. 
 The <a href="https://docs.rs/quinn/latest/quinn/generic/struct.EndpointBuilder.html">EndpointBuilder</a> has a method <a href="https://docs.rs/quinn/latest/quinn/generic/struct.EndpointBuilder.html#method.bind">bind(address)</a> with which you link an address to the endpoint. 
 This method initializes a UDP-socket that is used by quinn.
-If you need more control over the socket creation, it is also possible to initialize a quinn endpoint with an existing UDP socket. 
-For this use the method <a href="https://docs.rs/quinn/latest/quinn/generic/struct.EndpointBuilder.html#method.with_socket">with_socket</a>.</p>
-<p><strong>Client</strong></p>
-<p>Just like with a TCP client, you need to connect to a destination. 
-In quinn you can do this with the method <a href="https://docs.rs/quinn/latest/quinn/generic/struct.Endpoint.html#method.connect">connect()</a>. 
-The <a href="https://docs.rs/quinn/latest/quinn/generic/struct.Endpoint.html#method.connect">connect()</a> method has an argument 'server name', this is the name that is in the certificate. </p>
-<pre><pre class="playground"><code class="language-rust">
-<span class="boring">#![allow(unused)]
-</span><span class="boring">fn main() {
-</span>async fn client() -&gt; anyhow::Result&lt;()&gt; {
-    let mut endpoint_builder = Endpoint::builder();
-
-    // Bind this endpoint to a UDP socket on the given client address.
-    let (endpoint, _) = endpoint_builder.bind(&amp;client_addr())?;
-
-    // Connect to the server passing in the server name which is supposed to be in the server certificate.
-    let connection: NewConnection = endpoint
-        .connect(&amp;server_addr(), SERVER_NAME)?
-        .await?;
-
-    // Start transferring, receiving data, see DataTransfer tutorial.
-
-    Ok(())
-}
-<span class="boring">}
-</span></code></pre></pre>
+If you need more control over the socket creation, it is also possible to initialize a quinn endpoint with an existing UDP socket with <a href="https://docs.rs/quinn/latest/quinn/generic/struct.EndpointBuilder.html#method.with_socket">with_socket</a>. </p>
 <p><strong>Server</strong></p>
-<p>Just like a TCP Listener, you have to listen to incoming connections. 
-Before you can listen to connections you need to configure the <a href="https://docs.rs/quinn/latest/quinn/generic/struct.EndpointBuilder.html">EndpointBuilder</a> as a server.<br />
-Note that the configuration itself does not perform any listening logic, this can only be done after you have run <a href="https://docs.rs/quinn/latest/quinn/generic/struct.EndpointBuilder.html#method.bind">bind()</a>.</p>
+<p>Just like a TCP Listener, you have to listen to incoming connections.
+Before you can listen to connections you need to configure the <a href="https://docs.rs/quinn/latest/quinn/generic/struct.EndpointBuilder.html">EndpointBuilder</a> as a server. 
+Note that the configuration itself does not perform any listening logic, instead use the <code>Incomming</code> type returned by <a href="https://docs.rs/quinn/latest/quinn/generic/struct.EndpointBuilder.html#method.bind">bind()</a>.</p>
 <pre><pre class="playground"><code class="language-rust">
 <span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
@@ -240,6 +215,32 @@ Note that the configuration itself does not perform any listening logic, this ca
 }
 <span class="boring">}
 </span></code></pre></pre>
+<p><strong>Client</strong></p>
+<p>Just like a TCP client, you need to connect to a listening endpoint (the server).
+In quinn you can do this with the method <a href="https://docs.rs/quinn/latest/quinn/generic/struct.Endpoint.html#method.connect">connect()</a>.
+The <a href="https://docs.rs/quinn/latest/quinn/generic/struct.Endpoint.html#method.connect">connect()</a> method has an argument 'server name' which has to be the name that is in the configured certificate. </p>
+<pre><pre class="playground"><code class="language-rust">
+<span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>async fn client() -&gt; anyhow::Result&lt;()&gt; {
+    let mut endpoint_builder = Endpoint::builder();
+
+    // Bind this endpoint to a UDP socket on the given client address.
+    let (endpoint, _) = endpoint_builder.bind(&amp;client_addr())?;
+
+    // Connect to the server passing in the server name which is supposed to be in the server certificate.
+    let connection: NewConnection = endpoint
+        .connect(&amp;server_addr(), SERVER_NAME)?
+        .await?;
+
+    // Start transferring, receiving data, see data transfer page.
+
+    Ok(())
+}
+<span class="boring">}
+</span></code></pre></pre>
+<p><br><hr></p>
+<p><a href="set-up-connection.html">Nextup</a>, lets have a look at sending data over this connection.</p>
 
                     </main>
 

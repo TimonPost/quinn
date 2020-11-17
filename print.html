@@ -97,7 +97,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded "><a href="network-introduction.html"><strong aria-hidden="true">1.</strong> Network Introduction</a></li><li class="chapter-item expanded "><a href="quinn.html"><strong aria-hidden="true">2.</strong> QUINN Introduction</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="quinn/introduction.html"><strong aria-hidden="true">2.1.</strong> Overview</a></li><li class="chapter-item expanded "><a href="quinn/certificate.html"><strong aria-hidden="true">2.2.</strong> Cryptography Setup</a></li><li class="chapter-item expanded "><a href="quinn/set-up-connection.html"><strong aria-hidden="true">2.3.</strong> Connection Setup</a></li><li class="chapter-item expanded "><a href="quinn/data-transfer.html"><strong aria-hidden="true">2.4.</strong> Data Transfer</a></li></ol></li><li class="chapter-item expanded "><a href="quic.html"><strong aria-hidden="true">3.</strong> QUICK Introduction</a></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded "><a href="network-introduction.html"><strong aria-hidden="true">1.</strong> Network Introduction</a></li><li class="chapter-item expanded "><a href="quinn.html"><strong aria-hidden="true">2.</strong> QUINN Introduction</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="quinn/introduction.html"><strong aria-hidden="true">2.1.</strong> Overview</a></li><li class="chapter-item expanded "><a href="quinn/certificate.html"><strong aria-hidden="true">2.2.</strong> Certificate Configuration</a></li><li class="chapter-item expanded "><a href="quinn/set-up-connection.html"><strong aria-hidden="true">2.3.</strong> Connection Setup</a></li><li class="chapter-item expanded "><a href="quinn/data-transfer.html"><strong aria-hidden="true">2.4.</strong> Data Transfer</a></li></ol></li><li class="chapter-item expanded "><a href="quic.html"><strong aria-hidden="true">3.</strong> QUICK Introduction</a></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -305,8 +305,9 @@ the variable.</p>
 <li><strong>Benjamin Saunders</strong> - <em>Project owner &amp; founder</em></li>
 <li><strong>Jean-Christophe Begue</strong> - <em>Project collaborator, author of the HTTP/3 Implementation</em></li>
 </ul>
-<p>In the next chapter we will go through the protocol using examples. 
-The chapters are in order, first we look at configuring a certificate, then at setting up a connection and finally at sending data. </p>
+<p>In the following chapters we will go through the protocol using examples. 
+The chapters are in order, first we look at configuring a certificate which is <strong>required</strong>, 
+then at setting up a connection and finally at sending data about this connection. </p>
 <p>Contents:</p>
 <ol>
 <li><a href="quinn/certificate.html">Cryptography Setup</a></li>
@@ -465,13 +466,13 @@ builder.certificate(CertificateChain::from_certs(vec![certificate]), key)?;
 builder.add_certificate_authority(certificate)?;    
 <span class="boring">}
 </span></code></pre></pre>
-<p>This is the only thing you need to do for your client to be secured.</p>
+<p>This is the only thing you need to do for your client trust a server certificate. </p>
 <p><br><hr></p>
-<p><a href="quinn/set-up-connection.html">Nextup</a>, lets look at how to setup a connection. </p>
+<p><a href="quinn/set-up-connection.html">Nextup</a>, lets have a look at how to setup a connection. </p>
 <h1><a class="header" href="#connection-setup" id="connection-setup">Connection Setup</a></h1>
 <p>In the <a href="quinn/certificate.html">previous chapter</a> we looked at how to configure a certificate.
 This aspect is omitted in this chapter to prevent duplication. 
-But keep <strong>remember</strong> that is is required to get your <a href="https://docs.rs/quinn/latest/quinn/generic/struct.Endpoint.html">Endpoint</a> up and running. 
+But <strong>remember</strong> that is is required to get your <a href="https://docs.rs/quinn/latest/quinn/generic/struct.Endpoint.html">Endpoint</a> up and running. 
 This chapter explains how to set up a connection and prepare it for data transfer. </p>
 <p>It all starts with the <a href="https://docs.rs/quinn/latest/quinn/generic/struct.Endpoint.html">Endpoint</a> struct, this is the entry of the library. </p>
 <h2><a class="header" href="#example" id="example">Example</a></h2>
@@ -493,36 +494,11 @@ fn server_addr() -&gt; SocketAddr {
 <p>For both the server and the client we use the <a href="https://docs.rs/quinn/latest/quinn/generic/struct.EndpointBuilder.html">EndpointBuilder</a>. 
 The <a href="https://docs.rs/quinn/latest/quinn/generic/struct.EndpointBuilder.html">EndpointBuilder</a> has a method <a href="https://docs.rs/quinn/latest/quinn/generic/struct.EndpointBuilder.html#method.bind">bind(address)</a> with which you link an address to the endpoint. 
 This method initializes a UDP-socket that is used by quinn.
-If you need more control over the socket creation, it is also possible to initialize a quinn endpoint with an existing UDP socket. 
-For this use the method <a href="https://docs.rs/quinn/latest/quinn/generic/struct.EndpointBuilder.html#method.with_socket">with_socket</a>.</p>
-<p><strong>Client</strong></p>
-<p>Just like with a TCP client, you need to connect to a destination. 
-In quinn you can do this with the method <a href="https://docs.rs/quinn/latest/quinn/generic/struct.Endpoint.html#method.connect">connect()</a>. 
-The <a href="https://docs.rs/quinn/latest/quinn/generic/struct.Endpoint.html#method.connect">connect()</a> method has an argument 'server name', this is the name that is in the certificate. </p>
-<pre><pre class="playground"><code class="language-rust">
-<span class="boring">#![allow(unused)]
-</span><span class="boring">fn main() {
-</span>async fn client() -&gt; anyhow::Result&lt;()&gt; {
-    let mut endpoint_builder = Endpoint::builder();
-
-    // Bind this endpoint to a UDP socket on the given client address.
-    let (endpoint, _) = endpoint_builder.bind(&amp;client_addr())?;
-
-    // Connect to the server passing in the server name which is supposed to be in the server certificate.
-    let connection: NewConnection = endpoint
-        .connect(&amp;server_addr(), SERVER_NAME)?
-        .await?;
-
-    // Start transferring, receiving data, see DataTransfer tutorial.
-
-    Ok(())
-}
-<span class="boring">}
-</span></code></pre></pre>
+If you need more control over the socket creation, it is also possible to initialize a quinn endpoint with an existing UDP socket with <a href="https://docs.rs/quinn/latest/quinn/generic/struct.EndpointBuilder.html#method.with_socket">with_socket</a>. </p>
 <p><strong>Server</strong></p>
-<p>Just like a TCP Listener, you have to listen to incoming connections. 
-Before you can listen to connections you need to configure the <a href="https://docs.rs/quinn/latest/quinn/generic/struct.EndpointBuilder.html">EndpointBuilder</a> as a server.<br />
-Note that the configuration itself does not perform any listening logic, this can only be done after you have run <a href="https://docs.rs/quinn/latest/quinn/generic/struct.EndpointBuilder.html#method.bind">bind()</a>.</p>
+<p>Just like a TCP Listener, you have to listen to incoming connections.
+Before you can listen to connections you need to configure the <a href="https://docs.rs/quinn/latest/quinn/generic/struct.EndpointBuilder.html">EndpointBuilder</a> as a server. 
+Note that the configuration itself does not perform any listening logic, instead use the <code>Incomming</code> type returned by <a href="https://docs.rs/quinn/latest/quinn/generic/struct.EndpointBuilder.html#method.bind">bind()</a>.</p>
 <pre><pre class="playground"><code class="language-rust">
 <span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
@@ -545,6 +521,32 @@ Note that the configuration itself does not perform any listening logic, this ca
 }
 <span class="boring">}
 </span></code></pre></pre>
+<p><strong>Client</strong></p>
+<p>Just like a TCP client, you need to connect to a listening endpoint (the server).
+In quinn you can do this with the method <a href="https://docs.rs/quinn/latest/quinn/generic/struct.Endpoint.html#method.connect">connect()</a>.
+The <a href="https://docs.rs/quinn/latest/quinn/generic/struct.Endpoint.html#method.connect">connect()</a> method has an argument 'server name' which has to be the name that is in the configured certificate. </p>
+<pre><pre class="playground"><code class="language-rust">
+<span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>async fn client() -&gt; anyhow::Result&lt;()&gt; {
+    let mut endpoint_builder = Endpoint::builder();
+
+    // Bind this endpoint to a UDP socket on the given client address.
+    let (endpoint, _) = endpoint_builder.bind(&amp;client_addr())?;
+
+    // Connect to the server passing in the server name which is supposed to be in the server certificate.
+    let connection: NewConnection = endpoint
+        .connect(&amp;server_addr(), SERVER_NAME)?
+        .await?;
+
+    // Start transferring, receiving data, see data transfer page.
+
+    Ok(())
+}
+<span class="boring">}
+</span></code></pre></pre>
+<p><br><hr></p>
+<p><a href="quinn/set-up-connection.html">Nextup</a>, lets have a look at sending data over this connection.</p>
 <h1><a class="header" href="#data-transfer" id="data-transfer">Data Transfer</a></h1>
 <p>In the <a href="quinn/set-up-connection.html">previous chapter</a> we characterized how to set up an <a href="https://docs.rs/quinn/latest/quinn/generic/struct.Endpoint.html">Endpoint</a>
 and then get access to a <a href="https://docs.rs/quinn/latest/quinn/generic/struct.NewConnection.html">NewConnection</a> instance.
@@ -554,9 +556,9 @@ Now we will continue with the subject of sending data over this connection.</p>
 The big difference is that you are not limited to a single stream. 
 You can open multiple streams between two peers, this is also called multiplexing.</p>
 <p>Stream multiplexing can have a significant positive effect on application performance if the resources allocated to streams are properly prioritized.
-Currently it is used in a protocol like HTTP/2, but unlike HTTP multiplexing, QUIC does not automatically multiplexing data.
+Currently multiplexing it is used in a protocol like HTTP/2, but unlike HTTP multiplexing, QUIC does not automatically multiplex.
 This is an advantage because the user gets full control over the multiplexing. 
-In addition, QUIC is not limited to one kind of stream but can open both bidirectional and unidirectional streams.</p>
+Another difference compared to a TCP stream is that QUIC is not limited to one kind of stream but can open both bidirectional and unidirectional streams.</p>
 <h2><a class="header" href="#stream-types" id="stream-types">Stream Types</a></h2>
 <p>Quinn offers three ways to send your data. 
 Two stream-based and one message-based.</p>
@@ -565,9 +567,8 @@ Two stream-based and one message-based.</p>
 <tr><td align="left"><strong>Unidirectional Stream</strong></td><td align="left">one way stream communication.</td><td align="left">see <a href="https://docs.rs/quinn/latest/quinn/generic/struct.Connection.html#method.open_uni">open_uni</a></td></tr>
 <tr><td align="left"><strong>Unreliable Messaging</strong></td><td align="left">message based unreliable communication.</td><td align="left">see <a href="https://docs.rs/quinn/latest/quinn/generic/struct.Connection.html#method.send_datagram">send_datagram</a></td></tr>
 </tbody></table>
-<p>Soon we will discuss this in more detail.</p>
 <h2><a class="header" href="#how-to-use" id="how-to-use">How to Use</a></h2>
-<p>You can open a new stream or read from an existing stream of data.
+<p>You can open a new stream or read from an existing stream.
 New streams can be created with the methods <a href="https://docs.rs/quinn/latest/quinn/generic/struct.Connection.html#method.open_bi">open_bi</a>, <a href="https://docs.rs/quinn/latest/quinn/generic/struct.Connection.html#method.open_uni">open_uni</a> from <a href="https://docs.rs/quinn/latest/quinn/generic/struct.NewConnection.html#structfield.connection">Connection</a> type.
 An instance of this type is found in the <a href="https://docs.rs/quinn/latest/quinn/generic/struct.NewConnection.html#structfield.connection">connection</a> field of <a href="https://docs.rs/quinn/latest/quinn/generic/struct.NewConnection.html">NewConnection</a>. 
 This <a href="https://docs.rs/quinn/latest/quinn/generic/struct.NewConnection.html">NewConnection</a> stores existing streams as well. Lets look at some examples:</p>
@@ -676,7 +677,7 @@ This <a href="https://docs.rs/quinn/latest/quinn/generic/struct.NewConnection.ht
 <span class="boring">}
 </span></code></pre></pre>
 <h2><a class="header" href="#unreliable-messaging" id="unreliable-messaging">Unreliable Messaging</a></h2>
-<p>With unreliable messaging you can transfer data <a href="quinn/../network-introduction/transport-guarantees.html">unreliable</a> over bare UDP.</p>
+<p>With unreliable messaging you can transfer data unreliable over bare UDP.</p>
 <p><em>send datagram</em></p>
 <pre><pre class="playground"><code class="language-rust">
 <span class="boring">#![allow(unused)]
